@@ -119,7 +119,7 @@ class NgenBase(ModelExec):
             for id, values in data.items():
                 gage = values.get('Gage_no')
                 if gage:
-                    self._x_walk[id] = gage[0]
+                    self._x_walk[id] = gage
 
         #Read the calibration specific info
         with open(self.realization) as fp:
@@ -317,7 +317,7 @@ class NgenIndependent(NgenBase):
             except KeyError:
                 raise(RuntimeError("No suitable nexus found for catchment {}".format(id)))
             try:
-                nwis = self._x_walk.loc[id.replace('cat', 'wb')]
+                nwis = self._x_walk.loc[id]
                 #establish the hydro location for the observation nexus associated with this catchment
                 location = NWISLocation(nwis, nexus_data.name, nexus_data.geometry)
                 nexus = Nexus(nexus_data.name, location, (), id)
@@ -356,7 +356,7 @@ class NgenUniform(NgenBase):
             #look for an observable nexus
             try:
                 nexus_data = self._nexus_hydro_fabric.loc[toid]
-                nwis = self._x_walk.loc[id.replace('cat', 'wb')]
+                nwis = self._x_walk.loc[id]
                 #establish the hydro location for the observation nexus associated with this catchment
                 location = NWISLocation(nwis, nexus_data.name, nexus_data.geometry)
                 nexus = Nexus(nexus_data.name, location, (), id)
