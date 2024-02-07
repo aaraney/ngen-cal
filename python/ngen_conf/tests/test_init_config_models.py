@@ -3,6 +3,7 @@ from ngen.config.init_config.cfe import CFE
 from ngen.config.init_config.pet import PET
 from ngen.config.init_config.noahowp import NoahOWP
 from ngen.config.init_config.soil_freeze_thaw import SoilFreezeThaw
+from ngen.config.init_config.soil_moisture_profile import SoilMoistureProfile
 
 
 def test_cfe(cfe_init_config: str):
@@ -27,3 +28,8 @@ def test_noah_owp(noah_owp_init_config: str):
 def test_soil_freeze_thaw(soil_freeze_thaw_init_config: str):
     o = SoilFreezeThaw.from_ini_str(soil_freeze_thaw_init_config)
     assert o.to_ini_str() == soil_freeze_thaw_init_config
+
+
+def test_soil_moisture_profile(soil_moisture_profile_init_config: str):
+    o = SoilMoistureProfile.from_ini_str(soil_moisture_profile_init_config)
+    assert o.to_ini_str() == soil_moisture_profile_init_config
