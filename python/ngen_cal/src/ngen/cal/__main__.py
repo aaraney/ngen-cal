@@ -193,8 +193,6 @@ def main(general: General, model_conf: Mapping[str, Any]):
                 # TODO: validation_parms.objective and target are not being correctly configured
                 _execute(agent)
                 with pushd(agent.job.workdir):
-                    sim = calibration_object.output
-
                     assert isinstance(calibration_object, CalibrationSet)
                     # TODO: get from realization config
                     simulation_interval = pd.Timedelta(3600, unit="s")
@@ -208,6 +206,7 @@ def main(general: General, model_conf: Mapping[str, Any]):
                         end_time=eval_end,
                         simulation_interval=simulation_interval,
                     )
+                    sim = calibration_object.output
                     print(f"{sim=}")
                     print(f"{obs=}")
                     score = _objective_func(sim, obs, validation_parms.objective, (sim_start, sim_end))
