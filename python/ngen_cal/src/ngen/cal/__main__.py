@@ -110,10 +110,13 @@ def main(general: General, model_conf: Mapping[str, Any]):
     # print("Starting Best score: {}".format(meta.best_score))
     print("Starting calibration loop")
 
-    # call `ngen_cal_start` plugin hook functions
-    plugin_manager.hook.ngen_cal_start()
+    # REFACTOR
+    from ._experimental.errors import StopEarlyException
 
     try:
+        # call `ngen_cal_start` plugin hook functions
+        plugin_manager.hook.ngen_cal_start()
+
         #NOTE this assumes we calibrate each catchment independently, it may be possible to design an "aggregate" calibration
         #that works in a more sophisticated manner.
         if agent.model.strategy == 'explicit': #FIXME this needs a refactor...should be able to use a calibration_set with explicit loading
@@ -129,6 +132,14 @@ def main(general: General, model_conf: Mapping[str, Any]):
             #    func(start_iteration, general.iterations, catchment_set, agent)
             func(start_iteration, general.iterations, agent)
 
+    except StopEarlyException:
+        pass
+    # call `ngen_cal_finish` plugin hook functions
+    except Exception as e:
+        plugin_manager.hook.ngen_cal_finish(exception=e)
+        raise e
+
+    try:
         if (validation_parms := model.model.unwrap().val_params) is not None:
             print("configuring calibration")
             # NOTE: importing here so its easier to refactor in the future
