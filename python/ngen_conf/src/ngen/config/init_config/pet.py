@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import pint
 from enum import Enum
 from typing import Literal
 
 from ngen.init_config import serializer_deserializer as serde
-from pydantic import validator
+from pydantic import validator,Field, field_validator, ValidationInfo
 
+# Initialize Pint Unit Registry
+ureg = pint.UnitRegistry()
 
 class PetMethod(int, Enum):
     """
@@ -48,24 +51,82 @@ class PET(
     pet_method: PetMethod
     forcing_file: Literal["BMI"] = "BMI"
     run_unit_tests: bool = False  # bool; serialize as int
-    yes_aorc: bool = True  # bool; serialize as int
-    wind_speed_measurement_height_m: float  # 10.0 m
-    humidity_measurement_height_m: float  # 2.0
-    vegetation_height_m: float  # 0.12
-    zero_plane_displacement_height_m: float  # 0.0003
-    momentum_transfer_roughness_length_m: float  # 0.0
-    heat_transfer_roughness_length_m: float
-    surface_longwave_emissivity: float
-    surface_shortwave_albedo: float
-    latitude_degrees: float
-    longitude_degrees: float
-    site_elevation_m: float
-    time_step_size_s: int
-    num_timesteps: int
+    yes_aorc: bool  # bool; serialize as int
+    yes_wrf: bool  # bool; serialize as int
+
+    # --- Length Parameters ---
+    wind_speed_measurement_height_m: float = Field(..., description="m")  # 10.0 m
+    humidity_measurement_height_m: float = Field(..., description="m")  # 2.0
+    vegetation_height_m: float = Field(..., description="m")  # 0.12
+    zero_plane_displacement_height_m: float = Field(..., description="m")  # 0.0003
+    momentum_transfer_roughness_length: float = Field(..., description="m")  # 0.0
+    heat_transfer_roughness_length_m: float = Field(..., description="m")
+    site_elevation_m: float = Field(..., description="m")
+
+    # --- Radiation Parameters (Dimensionless Fractions) ---
+    surface_longwave_emissivity: float = Field(..., description="fraction 0-1")
+    surface_shortwave_albedo: float = Field(..., description="fraction 0-1")
+    
+    # --- Options ---
+    cloud_base_height_known: bool  # serialize in all caps
     shortwave_radiation_provided: bool  # bool; serialize as int
 
-    @validator("pet_method", pre=True)
-    def _coerce_pet_method(cls, value: str | int | PetMethod) -> int | PetMethod:
+    # --- Location & Time ---
+    latitude_degrees: float = Field(..., description="deg")
+    longitude_degrees: float = Field(..., description="deg")
+    time_step_size_s: int = Field(..., description="s")
+    num_timesteps: int
+
+    # @validator("pet_method", pre=True)
+    # def _coerce_pet_method(
+    #     cls, value: str | int | PetMethod
+    # ) -> int | PetMethod:
+    #     if isinstance(value, (PetMethod, int)):
+    #         return value
+    #     return int(value)
+
+    @field_validator(
+        "wind_speed_measurement_height_m", 
+        "humidity_measurement_height_m", 
+        "vegetation_height_m",
+        "zero_plane_displacement_height_m",
+        "momentum_transfer_roughness_length",
+        "heat_transfer_roughness_length_m",
+        "site_elevation_m"
+    )
+    @classmethod
+    def validate_meters(cls, v: float, info: ValidationInfo) -> float:
+        """Ensure length parameters are treated as meters."""
+        # This confirms the value can be interpreted as a length in meters
+        # and returns the magnitude.
+        return ureg.Quantity(v, "meter").magnitude
+
+    @field_validator("surface_longwave_emissivity", "surface_shortwave_albedo")
+    @classmethod
+    def validate_fractions(cls, v: float, info: ValidationInfo) -> float:
+        """Ensure radiation coefficients are dimensionless fractions between 0 and 1."""
+        qty = ureg.Quantity(v, "dimensionless")
+        if not (0.0 <= qty.magnitude <= 1.0):
+            raise ValueError(f"{info.field_name} must be a fraction between 0 and 1.")
+        return qty.magnitude
+
+    @field_validator("latitude_degrees", "longitude_degrees")
+    @classmethod
+    def validate_degrees(cls, v: float, info: ValidationInfo) -> float:
+        """Ensure coordinates are treated as degrees."""
+        return ureg.Quantity(v, "degree").magnitude
+
+    @field_validator("time_step_size_s")
+    @classmethod
+    def validate_seconds(cls, v: int, info: ValidationInfo) -> int:
+        """Ensure time step is treated as seconds."""
+        return int(ureg.Quantity(v, "second").magnitude)
+
+    @field_validator("pet_method", mode='before')
+    @classmethod
+    def _coerce_pet_method(
+        cls, value: str | int | PetMethod
+    ) -> int | PetMethod:
         if isinstance(value, (PetMethod, int)):
             return value
         return int(value)
