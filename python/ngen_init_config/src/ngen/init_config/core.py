@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import typing
 from datetime import datetime
 from functools import lru_cache
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict
 
-from pydantic import BaseModel
+import numpy as np
+import pint
+from pydantic import BaseModel, root_validator
 from pydantic.main import BaseModel, _missing
 from pydantic.utils import ValueItems
 
@@ -14,6 +17,14 @@ from .utils import merge_class_attr
 if TYPE_CHECKING:
     from pydantic.typing import AbstractSetIntStr, MappingIntStrAny, TupleGenerator
 
+# ---------------------------------------------------------------------
+# Pint application registry
+#
+# NOTE:
+#   - A single, shared registry is used application-wide.
+#   - We never store pint.Quantity on models; only magnitudes.
+# ---------------------------------------------------------------------
+_UNIT_REGISTRY = pint.get_application_registry()
 
 def _default_datetime_format(d: datetime) -> str:
     """ISO 8601 datetime string with truncated seconds (i.e. `2000-01-01T00:00:00`)
@@ -59,6 +70,53 @@ class Base(BaseModel):
             serialized (i.e. `.dict()` / `.json()`) using using the associated serialization
             function.
     """
+
+    # ------------------------------------------------------------------
+    # Centralized Pint unit validation and conversion engine
+    #
+    # Behavior:
+    #   - Fields may declare expected units via Field(..., units="meter")
+    #   - If the provided value is a pint.Quantity:
+    #       * validate dimensional compatibility
+    #       * convert to declared units
+    #       * store magnitude only
+    #   - If the value is NOT a pint.Quantity:
+    #       * leave unchanged
+    # ------------------------------------------------------------------
+    @root_validator(pre=True)
+    @classmethod
+    def _handle_pint_unit_conversions(
+        cls, values: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        for key, value in values.items():
+            field = cls.__fields__.get(key)
+            if field is None:
+                continue
+
+            units = field.field_info.extra.get("units")
+            if units is None:
+                continue
+
+            # NOTE: only perform unit validation / conversion when we encounter a pint.Quantity
+            if isinstance(value, pint.Quantity):
+                try:
+                    value = value.to(units)
+                except pint.DimensionalityError as exc:
+                    raise ValueError(
+                        f"Field '{key}' expects units compatible with '{units}', "
+                        f"got '{value.units}'"
+                    ) from exc
+
+                magnitude = value.magnitude
+
+                # NOTE: pydantic does not play well with numpy; convert to native list.
+                if isinstance(magnitude, np.ndarray):
+                    magnitude = magnitude.tolist()
+
+                values[key] = magnitude
+
+        return values
+
 
     class Config(BaseModel.Config):
         field_serializers: FieldSerializers
