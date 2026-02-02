@@ -5,7 +5,7 @@ import typing
 from datetime import datetime
 
 import typing_extensions
-from pydantic import validator
+from pydantic import Field, validator
 
 from ngen.config.path_pair.path_pair import PathPair, path_pair
 from ngen.init_config import serializer_deserializer as serde
@@ -120,23 +120,23 @@ class _SacSmaWrapper(serde.NamelistSerializerDeserializer):
 # NOTE: this is not a general sac-sma config file parser.
 #       it only parses sac-sma config files usable in ngen
 class SacSmaParams(serde.GenericSerializerDeserializer):
-    hru_area: float  # sq-km, needed for combination & routing conv.
-    uztwm: float
-    uzfwm: float
-    lztwm: float
-    lzfpm: float
-    lzfsm: float
-    adimp: float
-    uzk: float
-    lzpk: float
-    lzsk: float
-    zperc: float
-    rexp: float
-    pctim: float
-    pfree: float
-    riva: float
-    side: float
-    rserv: float
+    hru_area: float = Field(..., units="km**2")  # sq-km, needed for combination & routing conv.
+    uztwm: float = Field(..., units="mm")
+    uzfwm: float = Field(..., units="mm")
+    lztwm: float = Field(..., units="mm")
+    lzfpm: float = Field(..., units="mm")
+    lzfsm: float = Field(..., units="mm")
+    adimp: float = Field(..., units="dimensionless")
+    uzk: float = Field(..., units="1/day")
+    lzpk: float = Field(..., units="1/day")
+    lzsk: float = Field(..., units="1/day")
+    zperc: float = Field(..., units="dimensionless")
+    rexp: float = Field(..., units="dimensionless")
+    pctim: float = Field(..., units="dimensionless")
+    pfree: float = Field(..., units="dimensionless")
+    riva: float = Field(..., units="dimensionless")
+    side: float = Field(..., units="dimensionless")
+    rserv: float = Field(..., units="dimensionless")
 
     @typing_extensions.override
     @classmethod
