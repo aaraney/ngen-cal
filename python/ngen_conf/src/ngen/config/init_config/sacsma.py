@@ -11,6 +11,10 @@ from ngen.config.path_pair.path_pair import PathPair, path_pair
 from ngen.init_config import serializer_deserializer as serde
 from ngen.init_config.deserializer import from_namelist_str
 from ngen.init_config.serializer import format_serializers
+from ngen.init_config.units import (
+    Dimensionless, DimensionlessField,
+    Unit,
+)
 
 # TODO: refactor into independent module
 from .topmodel import _maybe_into_readliner, _Readliner
@@ -120,23 +124,23 @@ class _SacSmaWrapper(serde.NamelistSerializerDeserializer):
 # NOTE: this is not a general sac-sma config file parser.
 #       it only parses sac-sma config files usable in ngen
 class SacSmaParams(serde.GenericSerializerDeserializer):
-    hru_area: float = Field(..., units="km**2")  # sq-km, needed for combination & routing conv.
-    uztwm: float = Field(..., units="mm")
-    uzfwm: float = Field(..., units="mm")
-    lztwm: float = Field(..., units="mm")
-    lzfpm: float = Field(..., units="mm")
-    lzfsm: float = Field(..., units="mm")
-    adimp: float = Field(..., units="dimensionless")
-    uzk: float = Field(..., units="1/day")
-    lzpk: float = Field(..., units="1/day")
-    lzsk: float = Field(..., units="1/day")
-    zperc: float = Field(..., units="dimensionless")
-    rexp: float = Field(..., units="dimensionless")
-    pctim: float = Field(..., units="dimensionless")
-    pfree: float = Field(..., units="dimensionless")
-    riva: float = Field(..., units="dimensionless")
-    side: float = Field(..., units="dimensionless")
-    rserv: float = Field(..., units="dimensionless")
+    hru_area: float = Unit("km**2")  # sq-km, needed for combination & routing conv.
+    uztwm: float = Unit("mm")
+    uzfwm: float = Unit("mm")
+    lztwm: float = Unit("mm")
+    lzfpm: float = Unit("mm")
+    lzfsm: float = Unit("mm")
+    adimp: float = DimensionlessField(ge=0.0, le=1.0)
+    uzk: float = Unit("1/day")
+    lzpk: float = Unit("1/day")
+    lzsk: float = Unit("1/day")
+    zperc: float = Dimensionless
+    rexp: float = Dimensionless
+    pctim: float = DimensionlessField(ge=0.0, le=1.0)
+    pfree: float = DimensionlessField(ge=0.0, le=1.0)
+    riva: float = DimensionlessField(ge=0.0, le=1.0)
+    side: float = DimensionlessField(ge=0.0, le=1.0)
+    rserv: float = DimensionlessField(ge=0.0, le=1.0)
 
     @typing_extensions.override
     @classmethod
