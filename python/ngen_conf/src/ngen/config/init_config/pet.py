@@ -7,10 +7,10 @@ from ngen.init_config import serializer_deserializer as serde
 from ngen.init_config.units import (
     Meter,
     Second,
-    Dimensionless,
+    DimensionlessField,
     Unit,
 )
-from pydantic import validator, Field
+from pydantic import validator
 
 
 class PetMethod(int, Enum):
@@ -67,8 +67,8 @@ class PET(
     site_elevation_m: float = Meter
 
     # --- Radiation Parameters (Dimensionless Fractions) ---
-    surface_longwave_emissivity: float = Dimensionless(ge=0.0, le=1.0)
-    surface_shortwave_albedo: float = Dimensionless(ge=0.0, le=1.0)
+    surface_longwave_emissivity: float = DimensionlessField(ge=0.0, le=1.0)
+    surface_shortwave_albedo: float = DimensionlessField(ge=0.0, le=1.0)
 
     # --- Options ---
     cloud_base_height_known: bool  # serialize in all caps
