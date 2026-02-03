@@ -3,7 +3,10 @@ from __future__ import annotations
 import typing
 from datetime import datetime
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any
 
 import numpy as np
 import pint
@@ -66,8 +69,8 @@ class Base(BaseModel):
     @root_validator(pre=True)
     @classmethod
     def _handle_pint_unit_conversions(
-        cls, values: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        cls, values: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Normalize pint.Quantity inputs for unit-aware fields by validating compatibility,
         converting to declared units, and storing magnitudes only.
