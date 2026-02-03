@@ -17,14 +17,6 @@ from .utils import merge_class_attr
 if TYPE_CHECKING:
     from pydantic.typing import AbstractSetIntStr, MappingIntStrAny, TupleGenerator
 
-# ---------------------------------------------------------------------
-# Pint application registry
-#
-# NOTE:
-#   - A single, shared registry is used application-wide.
-#   - We never store pint.Quantity on models; only magnitudes.
-# ---------------------------------------------------------------------
-_UNIT_REGISTRY = pint.get_application_registry()
 
 def _default_datetime_format(d: datetime) -> str:
     """ISO 8601 datetime string with truncated seconds (i.e. `2000-01-01T00:00:00`)
@@ -71,23 +63,15 @@ class Base(BaseModel):
             function.
     """
 
-    # ------------------------------------------------------------------
-    # Centralized Pint unit validation and conversion engine
-    #
-    # Behavior:
-    #   - Fields may declare expected units via Field(..., units="meter")
-    #   - If the provided value is a pint.Quantity:
-    #       * validate dimensional compatibility
-    #       * convert to declared units
-    #       * store magnitude only
-    #   - If the value is NOT a pint.Quantity:
-    #       * leave unchanged
-    # ------------------------------------------------------------------
     @root_validator(pre=True)
     @classmethod
     def _handle_pint_unit_conversions(
         cls, values: Dict[str, Any]
     ) -> Dict[str, Any]:
+        """
+        Normalize pint.Quantity inputs for unit-aware fields by validating compatibility,
+        converting to declared units, and storing magnitudes only.
+        """
         for key, value in values.items():
             field = cls.__fields__.get(key)
             if field is None:
