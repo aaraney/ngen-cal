@@ -16,7 +16,7 @@ class UnitAwareFieldInfo(pydantic.fields.FieldInfo):
     Thin wrapper around a `pydantic.fields.FieldInfo` that adds unit information.
     """
 
-    def __init__(self, unit: str | "pint.Unit"):
+    def __init__(self, unit: str | pint.Unit):
         super().__init__(units=unit)
 
     def __call__(
@@ -84,7 +84,7 @@ class UnitAwareFieldInfo(pydantic.fields.FieldInfo):
         )
 
 
-def Unit(unit: str | "pint.Unit") -> typing.Any:
+def Unit(unit: str | "pint.Unit") -> Any:
     """
     Return a type-erased UnitAwareFieldInfo.
 
@@ -95,7 +95,7 @@ def Unit(unit: str | "pint.Unit") -> typing.Any:
     return UnitAwareFieldInfo(unit)
 
 
-def _unit(unit: str) -> tuple[UnitAwareFieldInfo, typing.Any]:
+def _unit(unit: str) -> tuple[UnitAwareFieldInfo, Any]:
     """
     Return a UnitAwareFieldInfo and type erased UnitAwareFieldInfo from a str.
 
