@@ -11,6 +11,12 @@ from ngen.config.path_pair.path_pair import PathPair, path_pair
 from ngen.init_config import serializer_deserializer as serde
 from ngen.init_config.deserializer import from_namelist_str
 from ngen.init_config.serializer import format_serializers
+from ngen.init_config.units import (
+    Meter,
+    Degree,
+    DimensionlessField,
+    Unit,
+)
 
 # TODO: refactor into independent module
 from .topmodel import _maybe_into_readliner, _Readliner
@@ -120,21 +126,21 @@ class _Snow17Wrapper(serde.NamelistSerializerDeserializer):
 # NOTE: this is not a general snow17 config file parser.
 #       it only parses snow17 config files usable in ngen
 class Snow17Params(serde.GenericSerializerDeserializer):
-    hru_area: float  # sq-km, needed for combination & routing conv.
-    latitude: float  # centroid latitude of hru (decimal degrees)
-    elev: float  # mean elevation of hru (m)
-    scf: float
-    mfmax: float
-    mfmin: float
-    uadj: float
-    si: float
-    pxtemp: float
-    nmf: float
-    tipm: float
-    mbase: float
-    plwhc: float
-    daygm: float
-    adc: list[float] = Field(min_items=11, max_items=11)
+    hru_area: float = Unit("km**2")  # sq-km, needed for combination & routing conv.
+    latitude: float= Unit("degree")  # centroid latitude of hru (decimal degrees)
+    elev: float = Meter  # mean elevation of hru (m)
+    scf: float = DimensionlessField(ge=0.0)
+    mfmax: float = Unit("mm / degC / hour")
+    mfmin: float = Unit("mm / degC / hour")
+    uadj: float = Unit("mm / mbar")
+    si: float = Unit("mm")
+    pxtemp: float = Unit("degC")
+    nmf: float = Unit("mm / degC / hour")
+    tipm: float = DimensionlessField(ge=0.0, le=1.0)
+    mbase: float = Unit("degC")
+    plwhc: float = DimensionlessField(ge=0.0, le=1.0)
+    daygm: float = Unit("mm / day")
+    adc: list[float] =  DimensionlessField(min_items=11, max_items=11)
 
     @typing_extensions.override
     @classmethod

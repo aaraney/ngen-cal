@@ -5,9 +5,6 @@ from datetime import datetime
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from typing import Any
-
 import numpy as np
 import pint
 from pydantic import BaseModel, root_validator
@@ -18,6 +15,7 @@ from .typing import FieldSerializers, TypeSerializers, flatten_args
 from .utils import merge_class_attr
 
 if TYPE_CHECKING:
+    from typing import Any
     from pydantic.typing import AbstractSetIntStr, MappingIntStrAny, TupleGenerator
 
 
