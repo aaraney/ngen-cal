@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import Literal, Optional, Union
 
 from ngen.init_config import serializer_deserializer
+from ngen.init_config.units import DimensionlessField
+
 from pydantic import Field
 from typing_extensions import override
 
@@ -68,7 +70,7 @@ class Lgar(serializer_deserializer.IniSerializerDeserializer):
     layer soil type (read from the database file soil_params_file)
     """
 
-    max_soil_types: int = Field(15, gt=1)
+    max_soil_types: int = DimensionlessField(default=15, gt=1)
     """
     maximum number of soil types read from the file soil_params_file (default is set to 15)
     """
