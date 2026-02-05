@@ -1,19 +1,26 @@
+from __future__ import annotations
+
 from enum import Enum
 from typing import Any, Dict, List, Literal, Optional, Union
 
 from ngen.init_config import serializer_deserializer
 from pydantic import root_validator
 from typing_extensions import override
+from ngen.init_config.units import (
+    Meter,
+    Kelvin,
+    Second,
+    Dimensionless,
+    DimensionlessField,
+    Unit,
+)
 
-from .utils import FloatUnitPair
+# from .utils import FloatUnitPair
 from .value_unit_pair import ListUnitPair, ValueUnitPair
 
-m = Literal["m"]
-m_per_m = Literal["m/m"]
-k = Literal["K"]
 empty = Literal[""]
 # empty string is equivalent to h / hr
-time_unit = Literal["s", "sec", "", "h", "hr", "d", "day"]
+# time_unit = Literal["s", "sec", "", "h", "hr", "d", "day"]
 
 
 class IceFractionScheme(str, Enum):
@@ -32,14 +39,14 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
 
     verbosity: Optional[Literal["high", "low", "none"]]
 
-    smcmax: FloatUnitPair[m_per_m]
+    smcmax: float = Dimensionless
     """
     state variable maximum soil moisture content (porosity)
 
     deprecated, but field can be specified as `soil_params.smcmax`
     """
 
-    b: FloatUnitPair[empty]
+    b: float = Dimensionless
     """
     state variable pore size distribution, beta exponent in ClappHornberger characteristic function
     Unit: m
@@ -47,7 +54,7 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
     deprecated, but field can be specified as `soil_params.b`
     """
 
-    satpsi: FloatUnitPair[m]
+    satpsi: float = Meter
     """
     state variable saturated capillary head (saturated moisture potential)
     Unit: m
@@ -55,7 +62,7 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
     deprecated, but field can be specified as `soil_params.satpsi`
     """
 
-    quartz: FloatUnitPair[empty]
+    quartz: float = Dimensionless
     """
     state variable soil quartz content, used in soil thermal conductivity function of PetersLidard
     Unit: m
@@ -71,19 +78,19 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
     """
 
     # TODO: verify that only meters are allowed
-    soil_z: ListUnitPair[float, m]
+    soil_z: List[float] = Meter
     """
     (1D array) m spatial resolution vertical resolution of the soil column (computational domain of
     the SFT model)
     """
 
     # TODO: verify that only kelvin is allowed
-    soil_temperature: ListUnitPair[float, k]
+    soil_temperature: List[float] = Kelvin
     """(1D array)spatial resolution initial soil temperature for the discretized column
     Unit: K
     """
 
-    soil_moisture_content: Optional[ListUnitPair[float, empty]] = None
+    soil_moisture_content: Optional[List[float]] = Dimensionless
     """
     (1D array) spatial resolution initial soil total (liquid + ice) moisture content for the
     discretized column
@@ -91,21 +98,21 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
     if soil_moisture_bmi is `False`, `soil_moisture_content` must be provided.
     """
 
-    soil_liquid_content: Optional[ListUnitPair[float, empty]] = None
+    soil_liquid_content: Optional[List[float]] = Dimensionless
     """
     (1D array) spatial resolution initial soil liquid moisture content for the discretized column
 
     if soil_moisture_bmi is `False`, `soil_liquid_content` must be provided.
     """
 
-    bottom_boundary_temp: Optional[ListUnitPair[float, k]] = None
+    bottom_boundary_temp: Optional[List[float]] = Kelvin
     """
     boundary condition temperature at the bottom boundary (BC) of the domain, if not specified, the
     default BC is zerogeothermal flux
     Unit: K
     """
 
-    top_boundary_temp: Optional[ListUnitPair[float, k]] = None
+    top_boundary_temp: Optional[List[float]] = Kelvin
     """
     boundary condition temperature at the top/surface boundary of the domain, if not specified, then
     other options include: 1) read from a file, or 2) provided through coupling
@@ -120,7 +127,7 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
     if soil_moisture_bmi is `False`, `soil_moisture_content` must be provided.
     """
 
-    end_time: Union[ValueUnitPair[int, time_unit], ValueUnitPair[float, time_unit]]
+    end_time: Union[int, float] = Unit("hour")
     """
     Simulation duration. This can also be though of as the total number of simulation time steps.
     Valid time units are:
@@ -130,7 +137,7 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
     Default unit is hour if unit is not provided (e.g. end_time=12[]).
     """
 
-    dt: Union[ValueUnitPair[int, time_unit], ValueUnitPair[float, time_unit]]
+    dt: Union[int, float] = Unit("hour")
     """
     Size of simulation time step.
     Valid time units are:
