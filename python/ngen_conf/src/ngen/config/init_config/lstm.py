@@ -4,7 +4,12 @@ from ngen.init_config import serializer_deserializer as serde
 from pathlib import Path
 
 from typing import Optional, Literal
-
+from ngen.init_config import serializer_deserializer as serde
+from ngen.init_config.units import (
+    Unit,
+    Meter,
+    DimensionlessField,
+)
 
 # TODO: add tests
 # TODO: modify once a better understanding of how LSTM is to be configured in practice. Based on the
@@ -20,11 +25,11 @@ class LSTM(serde.YamlSerializerDeserializer):
 
     # NOTE: other fields will likely need to be added in the future.
     # See: https://github.com/NOAA-OWP/ngen-cal/pull/49/files#r1265465514 for context
-    lat: float
-    lon: float
-    area_sqkm: float
-    elev_mean: float
-    slope_mean: float
+    lat: float = Unit("degree")
+    lon: float = Unit("degree")
+    area_sqkm: float = Unit("kilometer**2")
+    elev_mean: float = Meter
+    slope_mean: float = Unit("meter / kilometer")
 
     class Config(serde.YamlSerializerDeserializer.Config):
         field_serializers = {"verbose": lambda b: int(b)}
