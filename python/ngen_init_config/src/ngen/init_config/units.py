@@ -23,7 +23,10 @@ except ImportError:
     # Create a registry and load the critical definitions manually.
     # This ensures the package works even if hfATLAS is not installed,
     # preventing crashes on units like 'cms' or 'fraction'.
-    logger.warning("hfATLAS not found. Falling back to local UnitRegistry with hfATLAS definitions.")
+    logger.warning(
+        "hfATLAS not found. Falling back to local UnitRegistry with hfATLAS definitions."
+        "Install hfATLAS from https://github.com/lynker-spatial/hydrofabricATLAS"
+        )
     ureg = pint.UnitRegistry()
     
     # Inline definitions based on hfATLAS/units.txt to ensure compatibility
@@ -32,7 +35,7 @@ except ImportError:
         "cms = cubic_meter / second = m3/s",
         "fraction = 1 = frac",
         "pct = percent = percentage",
-        "decimal_degree = degree = dd",
+        "decimal_degree = dd",
         "ha = hectare",
         "thermal_conductivity_units = watt / meter / kelvin = W_m_K",
         "specific_heat_units = kilojoule / kilogram / degC = kJ_kg_C",
