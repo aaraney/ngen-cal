@@ -13,7 +13,6 @@ from ngen.init_config.deserializer import from_namelist_str
 from ngen.init_config.serializer import format_serializers
 from ngen.init_config.units import (
     Meter,
-    Degree,
     DimensionlessField,
     Unit,
 )
