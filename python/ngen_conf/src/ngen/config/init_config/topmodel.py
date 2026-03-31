@@ -22,6 +22,10 @@ from ngen.config.path_pair import PathPair
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+from ngen.init_config.units import Meter, Unit, Dimensionless
+# Define custom units not exported by default in units.py
+Hour = Unit("hour")
+MeterPerHour = Unit("m/h")
 
 @runtime_checkable
 class _Readliner(Protocol):
@@ -244,29 +248,29 @@ class TopModelSubcat(serde.GenericSerializerDeserializer):
 class TopModelParams(serde.GenericSerializerDeserializer):
     subcat: str
     """ info_string character title of subcatment; often same as model title"""
-    szm: float
+    szm: float = Meter
     """ meters parameter_fixed rainfall-runoff exponential scaling parameter for the decline of transmissivity with increase in storage deficit; units of depth"""
-    t0: float
+    t0: float = MeterPerHour
     """ meters/hour parameter_adjustable  downslope transmissivity when the soil is just saturated to the surface"""
-    td: float
+    td: float = Hour
     """ hours parameter_adjustable rainfall-runoff unsaturated zone time delay per unit storage deficit"""
-    chv: float
+    chv: float = MeterPerHour
     """ meters/hour parameter_fixed overland flow average channel flow velocity"""
-    rv: float
+    rv: float = MeterPerHour
     """ meters/hour parameter_fixed overland flow internal overland flow routing velocity"""
-    srmax: float
+    srmax: float = Meter
     """ meters parameter_adjustable rainfall-runoff maximum root zone storage deficit"""
-    q0: float
+    q0: float = MeterPerHour
     """ meters/hour state  initial subsurface flow per unit area"""
-    sr0: float
+    sr0: float = Meter
     """ meters state  initial root zone storage deficit below field capacity"""
     infex: Literal[0, 1] = 0
     """boolean option green-ampt set to 1 to call subroutine to do infiltration excess calcs; not usually appropriate in catchments where Topmodel is applicable (shallow highly permeable soils); default to 0"""
-    xk0: float
+    xk0: float = MeterPerHour
     """meters/hour parameter_adjustable rainfall-runoff surface soil hydraulic conductivity"""
-    hf: float
+    hf: float = Meter
     """meters parameter_adjustable green-ampt wetting front suction for G&A soln."""
-    dth: float
+    dth: float = Dimensionless
     """parameter_adjustable green-ampt water content change across the wetting front; dimensionless"""
 
     @validator("infex", pre=True)
