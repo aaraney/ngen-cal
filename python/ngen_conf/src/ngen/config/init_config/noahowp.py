@@ -8,6 +8,7 @@ from typing import ClassVar, List, Literal
 
 from ngen.init_config import core
 from ngen.init_config import serializer_deserializer as serde
+from ngen.init_config.units import Degree, DimensionlessField, Meter, Unit
 from pydantic import BaseModel, root_validator, validator
 
 from .noahowp_options import (
@@ -31,6 +32,9 @@ from .noahowp_options import (
 )
 from .utils import serialize_enum_value
 from .validators import validate_str_len_lt
+
+# Custom units
+Celsius = Unit("degC")
 
 MODIFIED_IGBP_MODIS_NOAH_NVEG = 20
 USGS_NVEG = 27
@@ -142,10 +146,10 @@ class Parameters(core.Base):
 
 
 class Location(core.Base):
-    lat: float
-    lon: float
-    terrain_slope: float
-    azimuth: float
+    lat: float = Degree
+    lon: float = Degree
+    terrain_slope: float = Degree
+    azimuth: float = Degree
 
     class Config(core.Base.Config):
         fields = {
@@ -159,8 +163,8 @@ class Location(core.Base):
 
 
 class Forcing(core.Base):
-    zref: float  #               = 10.0
-    rain_snow_thresh: float  #   = 1.0
+    zref: float = Meter  #               = 10.0
+    rain_snow_thresh: float = Celsius  #   = 1.0
 
     class Config(core.Base.Config):
         allow_population_by_field_name = True
@@ -259,10 +263,10 @@ class Structure(core.Base):
 
 
 class InitialValues(core.Base):
-    dzsnso: List[float]  # =  0.0,  0.0,  0.0,  0.1,  0.3,  0.6,  1.0
-    sice: List[float]  # =  0.0,  0.0,  0.0,  0.0
-    sh2o: List[float]  # =  0.3,  0.3,  0.3,  0.3
-    zwt: float  # =  -2.0
+    dzsnso: List[float] = Meter  # =  0.0,  0.0,  0.0,  0.1,  0.3,  0.6,  1.0
+    sice: List[float] = DimensionlessField  # =  0.0,  0.0,  0.0,  0.0
+    sh2o: List[float] = DimensionlessField  # =  0.3,  0.3,  0.3,  0.3
+    zwt: float = Meter  # =  -2.0
 
     class Config(core.Base.Config):
         fields = {
