@@ -78,9 +78,8 @@ class Base(BaseModel):
             if field is None:
                 continue
 
-            units = field.field_info.extra.get("units")
-            if units is None:
-                continue
+            # Fallback to "dimensionless" if the field does not have an explicit unit
+            units = field.field_info.extra.get("units") or "dimensionless"
 
             # NOTE: only perform unit validation / conversion when we encounter a pint.Quantity
             if isinstance(value, pint.Quantity):
