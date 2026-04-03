@@ -1,3 +1,6 @@
+import numpy as np
+import pint
+
 import pytest
 from ngen.init_config import (
     IniSerializerDeserializer,
@@ -9,6 +12,31 @@ from ngen.init_config import (
 from ngen.init_config.core import Base
 from typing import Any, Callable, Dict, List
 
+from ngen.init_config.units import Meter, Percent
+
+
+class Units(Base):
+    meter: float = Meter
+    percent_list: List[float] = Percent
+
+def test_pint_base_model_integration():
+    ureg = pint.get_application_registry()
+
+    meter_field_want = 4
+    percent_field_want = [0.25, 0.5, 0.75]
+
+    meter_field = meter_field_want * ureg.meter
+    percent_field = np.array(percent_field_want) * ureg.percent
+
+    # Test 1: Exact unit matches
+    m = Units(meter=meter_field, percent_list=percent_field)
+    assert m.meter == meter_field_want
+    assert m.percent_list == percent_field_want
+
+    # Test 2: Dimensionality conversion matches
+    m = Units(meter=meter_field.to("mm"), percent_list=percent_field.to("hectopercent"))
+    assert m.meter == meter_field_want
+    assert m.percent_list == percent_field_want
 
 class Lists(Base):
     bool_list: List[bool]
