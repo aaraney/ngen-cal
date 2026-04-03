@@ -27,6 +27,7 @@ dependencies = [
     "pydantic<2",
     "geojson_pydantic",
     "typing_extensions",
+    "pint",
     "ngen_init_config[all] @ git+https://github.com/noaa-owp/ngen-cal@master#egg=ngen_init_config&subdirectory=python/ngen_init_config",
 ]
 dynamic = ["version"]
