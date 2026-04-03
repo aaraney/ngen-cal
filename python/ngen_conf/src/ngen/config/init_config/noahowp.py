@@ -8,7 +8,7 @@ from typing import ClassVar, List, Literal
 
 from ngen.init_config import core
 from ngen.init_config import serializer_deserializer as serde
-from ngen.init_config.units import Degree, DimensionlessField, Meter, Unit
+from ngen.init_config.units import DimensionlessField, Meter, Unit
 from pydantic import BaseModel, root_validator, validator
 
 from .noahowp_options import (
@@ -35,6 +35,7 @@ from .validators import validate_str_len_lt
 
 # Custom units
 Celsius = Unit("degC")
+Degree = Unit("degree")
 
 MODIFIED_IGBP_MODIS_NOAH_NVEG = 20
 USGS_NVEG = 27
