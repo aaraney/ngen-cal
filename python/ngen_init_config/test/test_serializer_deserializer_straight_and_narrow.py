@@ -1,4 +1,3 @@
-import numpy as np
 import pint
 
 import pytest
@@ -26,7 +25,7 @@ def test_pint_base_model_integration():
     percent_field_want = [0.25, 0.5, 0.75]
 
     meter_field = meter_field_want * ureg.meter
-    percent_field = np.array(percent_field_want) * ureg.percent
+    percent_field = ureg.Quantity(percent_field_want, ureg.percent)
 
     # Test 1: Exact unit matches
     m = Units(meter=meter_field, percent_list=percent_field)
