@@ -5,7 +5,7 @@ from datetime import datetime
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
-import numpy as np
+# import numpy as np
 import pint
 from pydantic import BaseModel, root_validator
 from pydantic.main import BaseModel, _missing
@@ -26,6 +26,15 @@ def _default_datetime_format(d: datetime) -> str:
     """
     return d.isoformat(timespec="seconds")
 
+def _numpy_like(o: object) -> bool:
+    # references:
+    # ~1.0
+    # https://numpy.org/doc/1.26/user/basics.interoperability.html
+    # https://numpy.org/doc/1.26/reference/arrays.interface.html
+    # ~2.0
+    # https://numpy.org/doc/2.4/user/basics.interoperability.html
+    # https://numpy.org/doc/2.4/reference/arrays.interface.html
+    return hasattr(o, "__array_interface__")
 
 class Base(BaseModel):
     """Pydantic `BaseModel` subclass that adds several nice to have configuration options and sane
@@ -94,7 +103,7 @@ class Base(BaseModel):
                 magnitude = value.magnitude
 
                 # NOTE: pydantic does not play well with numpy; convert to native list.
-                if isinstance(magnitude, np.ndarray):
+                if _numpy_like(magnitude):
                     magnitude = magnitude.tolist()
 
                 values[key] = magnitude
