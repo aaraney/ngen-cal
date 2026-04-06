@@ -39,6 +39,7 @@ develop = [
     "pyyaml",
     "tomli",
     "tomli_w",
+    "numpy",
 ]
 namelist = ["f90nml"]
 yaml = ["pyyaml"]
