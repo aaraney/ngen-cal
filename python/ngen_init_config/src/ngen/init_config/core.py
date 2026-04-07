@@ -5,7 +5,6 @@ from datetime import datetime
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
-# import numpy as np
 import pint
 from pydantic import BaseModel, root_validator
 from pydantic.main import BaseModel, _missing
@@ -26,6 +25,7 @@ def _default_datetime_format(d: datetime) -> str:
     """
     return d.isoformat(timespec="seconds")
 
+
 def _numpy_like(o: object) -> bool:
     # references:
     # ~1.0
@@ -35,6 +35,7 @@ def _numpy_like(o: object) -> bool:
     # https://numpy.org/doc/2.4/user/basics.interoperability.html
     # https://numpy.org/doc/2.4/reference/arrays.interface.html
     return hasattr(o, "__array_interface__")
+
 
 class Base(BaseModel):
     """Pydantic `BaseModel` subclass that adds several nice to have configuration options and sane
@@ -76,19 +77,29 @@ class Base(BaseModel):
     @root_validator(pre=True)
     @classmethod
     def _handle_pint_unit_conversions(
-        cls, values: dict[str, Any]
-    ) -> dict[str, Any]:
+        cls, values: dict[str, Any] | Any
+    ) -> Any:
         """
         Normalize pint.Quantity inputs for unit-aware fields by validating compatibility,
         converting to declared units, and storing magnitudes only.
         """
+        # Defensive safeguard: if Pydantic passes None, return an empty dict
+        if values is None:
+            return {}
+
+        # 1. Handle edge cases where input is not a dictionary
+        if not isinstance(values, dict):
+            return values
+
+        # 2. Handle actual Pint Quantities
         for key, value in values.items():
             field = cls.__fields__.get(key)
             if field is None:
                 continue
 
-            # Fallback to "dimensionless" if the field does not have an explicit unit
-            units = field.field_info.extra.get("units") or "dimensionless"
+            extra = getattr(field.field_info, "extra", {})
+            units = extra.get("units") if extra else None
+            units = units or "dimensionless"
 
             # NOTE: only perform unit validation / conversion when we encounter a pint.Quantity
             if isinstance(value, pint.Quantity):
@@ -109,7 +120,6 @@ class Base(BaseModel):
                 values[key] = magnitude
 
         return values
-
 
     class Config(BaseModel.Config):
         field_serializers: FieldSerializers
@@ -210,10 +220,8 @@ class Base(BaseModel):
                             v,
                             to_dict=to_dict,
                             by_alias=by_alias,
-                            include=value_include
-                            and value_include.for_element(field_key),
-                            exclude=value_exclude
-                            and value_exclude.for_element(field_key),
+                            include=value_include and value_include.for_element(field_key),
+                            exclude=value_exclude and value_exclude.for_element(field_key),
                             exclude_unset=exclude_unset,
                             exclude_defaults=exclude_defaults,
                             exclude_none=exclude_none,
