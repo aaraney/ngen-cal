@@ -62,7 +62,7 @@ class PET(
     humidity_measurement_height_m: float = Meter  # 2.0
     vegetation_height_m: float = Meter  # 0.12
     zero_plane_displacement_height_m: float = Meter  # 0.0003
-    momentum_transfer_roughness_length: float = Meter  # 0.0
+    momentum_transfer_roughness_length_m: float = Meter  # 0.0
     heat_transfer_roughness_length_m: float = Meter
     site_elevation_m: float = Meter
 
