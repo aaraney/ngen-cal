@@ -13,7 +13,7 @@ from typing import (
 )
 
 import typing_extensions
-from pydantic import Field, root_validator, validator
+from pydantic import root_validator, validator
 
 import ngen.init_config.serializer_deserializer as serde
 from ngen.config.path_pair.path_pair import path_pair
@@ -22,10 +22,8 @@ from ngen.config.path_pair import PathPair
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-from ngen.init_config.units import Meter, Unit, Dimensionless
-# Define custom units not exported by default in units.py
-Hour = Unit("hour")
-MeterPerHour = Unit("m/h")
+from ngen.init_config.units import CommonUnits, Field
+
 
 @runtime_checkable
 class _Readliner(Protocol):
@@ -248,29 +246,29 @@ class TopModelSubcat(serde.GenericSerializerDeserializer):
 class TopModelParams(serde.GenericSerializerDeserializer):
     subcat: str
     """ info_string character title of subcatment; often same as model title"""
-    szm: float = Meter
+    szm: float = Field(units=CommonUnits.Meter)
     """ meters parameter_fixed rainfall-runoff exponential scaling parameter for the decline of transmissivity with increase in storage deficit; units of depth"""
-    t0: float = MeterPerHour
+    t0: float = Field(units="m/h")
     """ meters/hour parameter_adjustable  downslope transmissivity when the soil is just saturated to the surface"""
-    td: float = Hour
+    td: float = Field(units="hour")
     """ hours parameter_adjustable rainfall-runoff unsaturated zone time delay per unit storage deficit"""
-    chv: float = MeterPerHour
+    chv: float = Field(units="m/h")
     """ meters/hour parameter_fixed overland flow average channel flow velocity"""
-    rv: float = MeterPerHour
+    rv: float = Field(units="m/h")
     """ meters/hour parameter_fixed overland flow internal overland flow routing velocity"""
-    srmax: float = Meter
+    srmax: float = Field(units=CommonUnits.Meter)
     """ meters parameter_adjustable rainfall-runoff maximum root zone storage deficit"""
-    q0: float = MeterPerHour
+    q0: float = Field(units="m/h")
     """ meters/hour state  initial subsurface flow per unit area"""
-    sr0: float = Meter
+    sr0: float = Field(units=CommonUnits.Meter)
     """ meters state  initial root zone storage deficit below field capacity"""
     infex: Literal[0, 1] = 0
     """boolean option green-ampt set to 1 to call subroutine to do infiltration excess calcs; not usually appropriate in catchments where Topmodel is applicable (shallow highly permeable soils); default to 0"""
-    xk0: float = MeterPerHour
+    xk0: float = Field(units="m/h")
     """meters/hour parameter_adjustable rainfall-runoff surface soil hydraulic conductivity"""
-    hf: float = Meter
+    hf: float = Field(units=CommonUnits.Meter)
     """meters parameter_adjustable green-ampt wetting front suction for G&A soln."""
-    dth: float = Dimensionless
+    dth: float = Field(units=CommonUnits.Dimensionless)
     """parameter_adjustable green-ampt water content change across the wetting front; dimensionless"""
 
     @validator("infex", pre=True)
@@ -476,3 +474,4 @@ class Topmodel(serde.GenericSerializerDeserializer):
     @classmethod
     def from_file(cls, p: pathlib.Path, *_) -> Self:
         return cls.parse_file(p)
+    
