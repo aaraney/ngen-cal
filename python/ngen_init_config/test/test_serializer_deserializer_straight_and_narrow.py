@@ -11,13 +11,14 @@ from ngen.init_config import (
 from ngen.init_config.core import Base
 from typing import Any, Callable, Dict, List
 
-from ngen.init_config.units import Meter, Percent
+from ngen.init_config.units import CommonUnits, Field
 from test_utils import unlink_after
 
 
 class Units(Base):
-    meter: float = Meter
-    percent_list: List[float] = Percent
+    meter: float = Field(units=CommonUnits.Meter)
+    percent_list: List[float] = Field(units=CommonUnits.Percent)
+
 
 def test_pint_base_model_integration():
     ureg = pint.get_application_registry()
@@ -37,6 +38,7 @@ def test_pint_base_model_integration():
     m = Units(meter=meter_field.to("mm"), percent_list=percent_field.to("hectopercent"))
     assert m.meter == meter_field_want
     assert m.percent_list == percent_field_want
+
 
 class Lists(Base):
     bool_list: List[bool]
