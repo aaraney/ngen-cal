@@ -4,12 +4,7 @@ from enum import Enum
 from typing import Literal
 
 from ngen.init_config import serializer_deserializer as serde
-from ngen.init_config.units import (
-    Meter,
-    Second,
-    DimensionlessField,
-    Unit,
-)
+from ngen.init_config.units import CommonUnits, Field
 from pydantic import validator
 
 
@@ -58,26 +53,26 @@ class PET(
     yes_wrf: bool  # bool; serialize as int
 
     # --- Length Parameters ---
-    wind_speed_measurement_height_m: float = Meter  # 10.0 m
-    humidity_measurement_height_m: float = Meter  # 2.0
-    vegetation_height_m: float = Meter  # 0.12
-    zero_plane_displacement_height_m: float = Meter  # 0.0003
-    momentum_transfer_roughness_length_m: float = Meter  # 0.0
-    heat_transfer_roughness_length_m: float = Meter
-    site_elevation_m: float = Meter
+    wind_speed_measurement_height_m: float = Field(units=CommonUnits.Meter)  # 10.0 m
+    humidity_measurement_height_m: float = Field(units=CommonUnits.Meter)  # 2.0
+    vegetation_height_m: float = Field(units=CommonUnits.Meter)  # 0.12
+    zero_plane_displacement_height_m: float = Field(units=CommonUnits.Meter)  # 0.0003
+    momentum_transfer_roughness_length: float = Field(units=CommonUnits.Meter)  # 0.0
+    heat_transfer_roughness_length_m: float = Field(units=CommonUnits.Meter)
+    site_elevation_m: float = Field(units=CommonUnits.Meter)
 
     # --- Radiation Parameters (Dimensionless Fractions) ---
-    surface_longwave_emissivity: float = DimensionlessField(ge=0.0, le=1.0)
-    surface_shortwave_albedo: float = DimensionlessField(ge=0.0, le=1.0)
+    surface_longwave_emissivity: float = Field(ge=0.0, le=1.0, units=CommonUnits.Dimensionless)
+    surface_shortwave_albedo: float = Field(ge=0.0, le=1.0, units=CommonUnits.Dimensionless)
 
     # --- Options ---
     cloud_base_height_known: bool  # serialize in all caps
     shortwave_radiation_provided: bool  # bool; serialize as int
 
     # --- Location & Time ---
-    latitude_degrees: float = Unit("degree")
-    longitude_degrees: float = Unit("degree")
-    time_step_size_s: int = Second
+    latitude_degrees: float = Field(units="degree")
+    longitude_degrees: float = Field(units="degree")
+    time_step_size_s: int = Field(units=CommonUnits.Second)
     num_timesteps: int
 
     @validator("pet_method", pre=True)
@@ -93,3 +88,4 @@ class PET(
         no_section_headers = True
         field_type_serializers = {bool: lambda b: int(b), PetMethod: lambda e: e.value}
         field_serializers = {"cloud_base_height_known": lambda b: str(b).upper()}
+        
