@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import functools
 import typing
 from datetime import datetime
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
 import pint
+import pydantic
 from pydantic import BaseModel, root_validator
 from pydantic.main import BaseModel, _missing
 from pydantic.utils import ValueItems
@@ -76,33 +78,22 @@ class Base(BaseModel):
 
     @root_validator(pre=True)
     @classmethod
-    def _handle_pint_unit_conversions(
-        cls, values: dict[str, Any] | Any
-    ) -> Any:
+    def _handle_pint_unit_conversions(cls, values: dict[str, Any]) -> dict[str, Any]:
         """
         Normalize pint.Quantity inputs for unit-aware fields by validating compatibility,
         converting to declared units, and storing magnitudes only.
         """
-        # Defensive safeguard: if Pydantic passes None, return an empty dict
-        if values is None:
-            return {}
-
-        # 1. Handle edge cases where input is not a dictionary
-        if not isinstance(values, dict):
-            return values
-
-        # 2. Handle actual Pint Quantities
+        fields = cls.__public_fields__
         for key, value in values.items():
-            field = cls.__fields__.get(key)
-            if field is None:
-                continue
-
-            extra = getattr(field.field_info, "extra", {})
-            units = extra.get("units") if extra else None
-            units = units or "dimensionless"
-
             # NOTE: only perform unit validation / conversion when we encounter a pint.Quantity
             if isinstance(value, pint.Quantity):
+                field = fields.get(key)
+                if field is None:
+                    continue
+
+                # Fallback to "dimensionless" if the field does not have an explicit unit
+                units = field.field_info.extra.get("units") or "dimensionless"
+
                 try:
                     value = value.to(units)
                 except pint.DimensionalityError as exc:
@@ -120,6 +111,30 @@ class Base(BaseModel):
                 values[key] = magnitude
 
         return values
+
+    @classmethod
+    @property
+    @functools.lru_cache
+    def __public_fields__(cls) -> typing.Mapping[str, pydantic.fields.ModelField]:
+        """
+        Mapping from alias or field name(s) to pydantic.fields.ModelField.
+        Mappings from both alias and field name are present if the model is
+        configured with allow_population_by_field_name.
+        """
+        allow_population_by_field_name = cls.Config.allow_population_by_field_name
+        fields = {}
+        for field in cls.__fields__.values():
+            # has no alias; use field name
+            if not field.has_alias:
+                fields[field.name] = field
+                continue
+            # has alias; use alias name
+            fields[field.alias] = field
+
+            # field names act like aliases; also use field name
+            if allow_population_by_field_name:
+                fields[field.name] = field
+        return fields
 
     class Config(BaseModel.Config):
         field_serializers: FieldSerializers
