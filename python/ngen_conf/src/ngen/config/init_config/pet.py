@@ -58,20 +58,20 @@ class PET(
     zero_plane_displacement_height_m: float = Field(units=CommonUnits.Meter)  # 0.0003
     momentum_transfer_roughness_length_m: float = Field(units=CommonUnits.Meter)  # 0.0
     heat_transfer_roughness_length_m: float = Field(units=CommonUnits.Meter)
-    site_elevation_m: float = Field(units=CommonUnits.Meter)
 
     # --- Radiation Parameters (Dimensionless Fractions) ---
     surface_longwave_emissivity: float = Field(ge=0.0, le=1.0, units=CommonUnits.Dimensionless)
     surface_shortwave_albedo: float = Field(ge=0.0, le=1.0, units=CommonUnits.Dimensionless)
 
-    # --- Options ---
-    shortwave_radiation_provided: bool  # bool; serialize as int
-
     # --- Location & Time ---
     latitude_degrees: float = Field(units="degree")
     longitude_degrees: float = Field(units="degree")
+    site_elevation_m: float = Field(units=CommonUnits.Meter)
     time_step_size_s: int = Field(units=CommonUnits.Second)
     num_timesteps: int
+
+    # --- Options ---
+    shortwave_radiation_provided: bool  # bool; serialize as int
 
     @validator("pet_method", pre=True)
     def _coerce_pet_method(
@@ -86,4 +86,3 @@ class PET(
         no_section_headers = True
         field_type_serializers = {bool: lambda b: int(b), PetMethod: lambda e: e.value}
         field_serializers = {"cloud_base_height_known": lambda b: str(b).upper()}
-        
