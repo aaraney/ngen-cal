@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Literal, Optional, Union
 from ngen.init_config import serializer_deserializer
 from pydantic import root_validator
 from typing_extensions import override
-from ngen.init_config.units import DimensionlessField
 
 from .utils import FloatUnitPair
 from .value_unit_pair import ListUnitPair, ValueUnitPair
@@ -193,3 +192,4 @@ class SoilFreezeThaw(serializer_deserializer.IniSerializerDeserializer):
         # extra space is not accounted for
         # https://github.com/NOAA-OWP/SoilFreezeThaw/blob/c674deadb27a2fa9bff79ff2f18dac9501a18fc9/src/soil_freeze_thaw.cxx#L134C5-L134C16
         space_around_delimiters: bool = False
+        
