@@ -50,7 +50,6 @@ class PET(
     forcing_file: Literal["BMI"] = "BMI"
     run_unit_tests: bool = False  # bool; serialize as int
     yes_aorc: bool = True  # bool; serialize as int
-    yes_wrf: bool  # bool; serialize as int
 
     # --- Length Parameters ---
     wind_speed_measurement_height_m: float = Field(units=CommonUnits.Meter)  # 10.0 m
@@ -66,7 +65,6 @@ class PET(
     surface_shortwave_albedo: float = Field(ge=0.0, le=1.0, units=CommonUnits.Dimensionless)
 
     # --- Options ---
-    cloud_base_height_known: bool  # serialize in all caps
     shortwave_radiation_provided: bool  # bool; serialize as int
 
     # --- Location & Time ---
