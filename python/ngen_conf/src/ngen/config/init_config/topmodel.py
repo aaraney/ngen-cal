@@ -80,7 +80,7 @@ class TopModelSubcat(serde.GenericSerializerDeserializer):
     # NOTE: length is equal to `num_channels`
     cum_dist_area_with_dist: List[float]
     # NOTE: length is equal to `num_channels`
-    dist_from_outlet: List[float]
+    dist_from_outlet: List[float] = Field(units=CommonUnits.Meter)
 
     @typing_extensions.override
     @classmethod
@@ -474,4 +474,3 @@ class Topmodel(serde.GenericSerializerDeserializer):
     @classmethod
     def from_file(cls, p: pathlib.Path, *_) -> Self:
         return cls.parse_file(p)
-    
