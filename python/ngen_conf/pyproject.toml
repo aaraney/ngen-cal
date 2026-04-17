@@ -48,7 +48,7 @@ develop = [
 version = { attr = "ngen.config._version.__version__" }
 
 [tool.uv.sources]
-ngen_init_config = { path = "../ngen_init_config/",  marker = "'extra' == 'all'" }
+ngen_init_config = { path = "../ngen_init_config/" }
 
 [dependency-groups]
 dev = [
