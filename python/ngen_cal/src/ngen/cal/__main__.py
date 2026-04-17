@@ -219,8 +219,9 @@ def main(general: General, model_conf: Mapping[str, Any]):
 
     # call `ngen_cal_finish` plugin hook functions if there was an exception
     # that could not be handled
-    except StopEarly:
-        pass
+    except StopEarly as e:
+        # don't raise, but still notify plugins
+        plugin_manager.hook.ngen_cal_finish(exception=e)
     except Exception as e:
         plugin_manager.hook.ngen_cal_finish(exception=e)
         raise e
