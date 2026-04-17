@@ -107,12 +107,14 @@ def test_serialize_str_does_not_end_in_eol_char(
 import contextlib
 from pathlib import Path
 
+
 @contextlib.contextmanager
 def unlink_after(p: Path):
     try:
         yield p
     finally:
         p.unlink(missing_ok=True)
+
 
 def test_serialize_to_file_includes_trailing_eol(toml_test: str):
     # NOTE: `to_ini_str` is not included. python's `configparser` library does not natively support lists
@@ -124,7 +126,7 @@ def test_serialize_to_file_includes_trailing_eol(toml_test: str):
         # Explicit close is required on Windows to release the lock
         tmp.close()
         p = Path(tmp.name)
-        
+
         with unlink_after(p):
             o.to_yaml(p)
             assert p.read_text().endswith("\n")
@@ -137,6 +139,7 @@ def test_serialize_to_file_includes_trailing_eol(toml_test: str):
 
             o.to_json(p)
             assert p.read_text().endswith("\n")
+
 
 # NOTE: python's `configparser` library does not natively support lists, only support bool, int,
 # float, str. see: https://en.wikipedia.org/wiki/INI_file#Comparison_of_INI_parsers
@@ -246,3 +249,12 @@ def test_case_sensitivity_key_to_ini():
     s = o.to_ini_str()
     lines = s.split("\n")
     assert lines == ["UPPER = True", "lower = False"]
+
+
+def test_case_sensitivity_key_from_ini():
+    expected = """UPPER = True
+lower = False"""
+    o = IniCaseSensitiveKeys.from_ini_str(expected)
+
+    s = o.to_ini_str()
+    assert s == expected

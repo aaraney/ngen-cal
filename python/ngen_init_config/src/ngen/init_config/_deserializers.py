@@ -9,9 +9,10 @@ from .utils import try_import
 from ._constants import NO_SECTIONS
 
 
-def from_ini_str(ini_str: str, m: type[M]) -> M:
+def from_ini_str(ini_str: str, m: type[M], *, preserve_key_case: bool = False) -> M:
     cp = configparser.ConfigParser(interpolation=None)
-    # cp.optionxform = str
+    if preserve_key_case:
+        cp.optionxform = str
     cp.read_string(ini_str)
     values = {
         section_name: dict(cp.items(section_name)) for section_name in cp.sections()
@@ -19,8 +20,10 @@ def from_ini_str(ini_str: str, m: type[M]) -> M:
     return m.parse_obj(values)
 
 
-def from_ini_no_section_header_str(ini_str: str, m: type[M]) -> M:
+def from_ini_no_section_header_str(ini_str: str, m: type[M], *, preserve_key_case: bool = False) -> M:
     cp = configparser.ConfigParser(interpolation=None)
+    if preserve_key_case:
+        cp.optionxform = str
     cp.read_string(f"[{NO_SECTIONS}]\n" + ini_str)
 
     # only NO_SECTIONS should be present
