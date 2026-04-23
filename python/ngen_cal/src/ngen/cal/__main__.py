@@ -144,6 +144,14 @@ def _validation(agent: Agent, validation_parms: ValidationOptions):
 
 
 def main(general: General, model_conf: Mapping[str, Any]):
+    plugins = cast(List[Union[Callable, ModuleType]], general.plugins)
+    plugin_manager = setup_plugin_manager(plugins)
+
+    print(_loaded_plugins(plugin_manager))
+
+    # setup plugins
+    plugin_manager.hook.ngen_cal_configure(config=general)
+
     #seed the random number generators if requested
     if general.random_seed is not None:
         import random
@@ -157,14 +165,6 @@ def main(general: General, model_conf: Mapping[str, Any]):
     # NOTE: if support for new models is added, this will need to be modified
     assert isinstance(model.model, Ngen), f"ngen.cal.ngen.Ngen expected, got {type(model.model)}"
     model_inner = model.model.unwrap()
-
-    plugins = cast(List[Union[Callable, ModuleType]], general.plugins)
-    plugin_manager = setup_plugin_manager(plugins)
-
-    print(_loaded_plugins(plugin_manager))
-
-    # setup plugins
-    plugin_manager.hook.ngen_cal_configure(config=general)
 
     print("Starting calib")
 
