@@ -152,56 +152,56 @@ def main(general: General, model_conf: Mapping[str, Any]):
     # setup plugins
     plugin_manager.hook.ngen_cal_configure(config=general)
 
-    #seed the random number generators if requested
-    if general.random_seed is not None:
-        import random
-        random.seed(general.random_seed)
-        import numpy as np
-        np.random.seed(general.random_seed)
-
-    # model scope plugins setup in constructor
-    model = Model(model=model_conf)
-
-    # NOTE: if support for new models is added, this will need to be modified
-    assert isinstance(model.model, Ngen), f"ngen.cal.ngen.Ngen expected, got {type(model.model)}"
-    model_inner = model.model.unwrap()
-
-    print("Starting calib")
-
-    """
-    TODO calibrate each "catcment" independely, but there may be something interesting in grouping various formulation params
-    into a single variable vector and calibrating a set of heterogenous formultions...
-    """
-    start_iteration = 0
-
-    # Initialize the starting agent
-    agent = Agent(model, general.workdir, general.log, general.restart, general.strategy.parameters)
-
-    # Agent mutates the model config, so `ngen_cal_model_configure` is called afterwards
-    model_inner._plugin_manager.hook.ngen_cal_model_configure(config=model_inner)
-
-    if general.strategy.algorithm == Algorithm.dds:
-        func = dds_set #FIXME what about explicit/dds
-        start_iteration = general.start_iteration
-        if general.restart:
-            start_iteration = agent.restart()
-    elif general.strategy.algorithm == Algorithm.pso: #TODO how to restart PSO?
-        if agent.model.strategy != "uniform":
-            print("Can only use PSO with the uniform model strategy")
-            return
-        if general.restart:
-            print("Restart not supported for PSO search, starting at 0")
-        func = pso_search
-
-    print(f"Starting Iteration: {start_iteration}")
-    # print("Starting Best param: {}".format(meta.best_params))
-    # print("Starting Best score: {}".format(meta.best_score))
-    print("Starting calibration loop")
-
-    # call `ngen_cal_start` plugin hook functions
-    plugin_manager.hook.ngen_cal_start()
-
     try:
+        #seed the random number generators if requested
+        if general.random_seed is not None:
+            import random
+            random.seed(general.random_seed)
+            import numpy as np
+            np.random.seed(general.random_seed)
+
+        # model scope plugins setup in constructor
+        model = Model(model=model_conf)
+
+        # NOTE: if support for new models is added, this will need to be modified
+        assert isinstance(model.model, Ngen), f"ngen.cal.ngen.Ngen expected, got {type(model.model)}"
+        model_inner = model.model.unwrap()
+
+        print("Starting calib")
+
+        """
+        TODO calibrate each "catcment" independely, but there may be something interesting in grouping various formulation params
+        into a single variable vector and calibrating a set of heterogenous formultions...
+        """
+        start_iteration = 0
+
+        # Initialize the starting agent
+        agent = Agent(model, general.workdir, general.log, general.restart, general.strategy.parameters)
+
+        # Agent mutates the model config, so `ngen_cal_model_configure` is called afterwards
+        model_inner._plugin_manager.hook.ngen_cal_model_configure(config=model_inner)
+
+        if general.strategy.algorithm == Algorithm.dds:
+            func = dds_set #FIXME what about explicit/dds
+            start_iteration = general.start_iteration
+            if general.restart:
+                start_iteration = agent.restart()
+        elif general.strategy.algorithm == Algorithm.pso: #TODO how to restart PSO?
+            if agent.model.strategy != "uniform":
+                print("Can only use PSO with the uniform model strategy")
+                return
+            if general.restart:
+                print("Restart not supported for PSO search, starting at 0")
+            func = pso_search
+
+        print(f"Starting Iteration: {start_iteration}")
+        # print("Starting Best param: {}".format(meta.best_params))
+        # print("Starting Best score: {}".format(meta.best_score))
+        print("Starting calibration loop")
+
+        # call `ngen_cal_start` plugin hook functions
+        plugin_manager.hook.ngen_cal_start()
+
         #NOTE this assumes we calibrate each catchment independently, it may be possible to design an "aggregate" calibration
         #that works in a more sophisticated manner.
         if agent.model.strategy == 'explicit': #FIXME this needs a refactor...should be able to use a calibration_set with explicit loading
