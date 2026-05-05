@@ -2,11 +2,10 @@ from pathlib import Path
 from typing import Literal, Optional, Union
 
 from ngen.init_config import serializer_deserializer
-from pydantic import Field
+from ngen.init_config.units import Field
 from typing_extensions import override
 
 from .utils import CSList, FloatUnitPair
-from .value_unit_pair import ListUnitPair
 
 
 class Casam(serializer_deserializer.IniSerializerDeserializer):
@@ -26,14 +25,14 @@ class Casam(serializer_deserializer.IniSerializerDeserializer):
     units: -
     """
 
-    layer_thickness: Union[ListUnitPair[float, Literal["cm"]], CSList[float]]
+    layer_thickness: Union[float, CSList[float]] = Field(units="cm")
     """
     individual layer thickness (not absolute)
 
     units: cm
     """
 
-    initial_psi: Union[float, FloatUnitPair[Literal["cm"]]]
+    initial_psi: float = Field(units="cm")
     """
     >=0	cm	capillary head
     used to initialize layers with a constant head
@@ -42,7 +41,7 @@ class Casam(serializer_deserializer.IniSerializerDeserializer):
     bounds: >= 0
     """
 
-    ponded_depth_max: Union[float, FloatUnitPair[Literal["cm"]]]
+    ponded_depth_max: float = Field(units="cm")
     """
     >=0	cm	maximum surface ponding
     the maximum amount of water unavailable for surface drainage, default is set to zero
@@ -90,7 +89,7 @@ class Casam(serializer_deserializer.IniSerializerDeserializer):
     units: -
     """
 
-    wilting_point_psi: Union[float, FloatUnitPair[Literal["cm"]]]
+    wilting_point_psi: float = Field(units="cm")
     """
     wilting point (the amount of water not available for plants) used in computing AET
 
@@ -98,7 +97,7 @@ class Casam(serializer_deserializer.IniSerializerDeserializer):
     bounds: > 0
     """
 
-    field_capacity_psi: Union[float, FloatUnitPair[Literal["cm"]]]
+    field_capacity_psi: float = Field(units="cm")
     """
     capillary head corresponding to volumetric water content at which gravity drainage becomes slower, used in computing AET.
     suggested value is 340.9 cm for most soils, corresponding to 1/3 atm, and 103.3 cm for sands, corresponding to 1/10 atm.
@@ -138,7 +137,7 @@ class Casam(serializer_deserializer.IniSerializerDeserializer):
     units: -
     """
 
-    soil_z: Union[ListUnitPair[float, Literal["cm"]], CSList[float]]
+    soil_z: CSList[float] = Field(units="cm")
     """
     vertical resolution of the soil column (computational domain of the SFT model)
 
@@ -185,7 +184,7 @@ class Casam(serializer_deserializer.IniSerializerDeserializer):
     units: -
     """
 
-    mbal_tol: float = Field(default=10.0, gt=0)
+    mbal_tol: float = Field(default=10.0, gt=0, units="cm")
     """
     mass balance error resulting from a substep that will trigger a model crash
 
