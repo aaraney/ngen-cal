@@ -210,7 +210,6 @@ def _read_csv_output_v1_no_time(filepath: Path) -> pd.DataFrame:
     # row   : "2420800,0.0,0.0,0.0,..."
     # n_columns = 1 + number of timesteps (`nts`) * 3
     df = pd.read_csv(filepath, index_col=0)
-    df.index = df.index.map(lambda x: "wb-" + str(x))
     df.index.name = "waterbody_code"
     tuples = [_parse_column_csv_output_v1(x) for x in df.columns]
     df.columns = pd.MultiIndex.from_tuples(
