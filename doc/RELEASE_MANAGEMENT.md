@@ -27,7 +27,7 @@ The release process can be summarized fairly simply:
     - The name of this branch should be prefixed with either `release-` or `rc-`
     - The name should end with a date string fo the day of creation, in the format `YYYYMMDD`
     - E.g., branch name `release-20241004`
-2. Versions are [incremented appropriately](#individual-package-version-rules) for Python packages 
+2. Versions are [incremented appropriately](#individual-package-version-rules) for Python packages
    - Any package that has been modified compared to `production` should have its version incremented
    - Each package has its version set within its `_version.py` file
    - Internal dependency relationships between the packages may also need to be incremented
@@ -69,7 +69,7 @@ Development versions should be used if it becomes necessary to track transitive 
 
 ## Tracking Released Versions for Packages
 
-Since _ngen-cal_ does not (currently) have a distinct versioning scheme at the repository level, new releases are thought of as composed of new versions of one or more of the nested Python packages.  Because of this, version tags are applied to the repo that are specific to both an updated package and that package's new version, following the pattern `<package_name>/v<pacakge_version>`; e.g., `ngen.cal/v0.3.0`  
+Since _ngen-cal_ does not (currently) have a distinct versioning scheme at the repository level, new releases are thought of as composed of new versions of one or more of the nested Python packages.  Because of this, version tags are applied to the repo that are specific to both an updated package and that package's new version, following the pattern `<package_name>/v<pacakge_version>`; e.g., `ngen.cal/v0.3.0`
 
 Put another way, for every nested Python package _PKG_, and for the package version _VER_ of _PKG_ present in the source code according to the `HEAD` commit of the `production` branch, a tag named "*PKG*/v*VER*" should exist pointing to a commit in the history of `production`; if it does not - in particular, whenever `HEAD` is changed - such a tag should be applied to the `HEAD` of `production`.
 
@@ -77,4 +77,3 @@ For example, when it is time for a new official release, if only the `ngen.cal` 
 
 * `ngen.cal/v0.3.0`
 * `ngen.init_config/v0.1.0`
-

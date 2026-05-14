@@ -128,4 +128,3 @@ class Lgar(serializer_deserializer.IniSerializerDeserializer):
         space_around_delimiters: bool = False
         field_type_serializers = {bool: lambda b: str(b).lower()}
         preserve_key_case: bool = True
-        

@@ -67,7 +67,7 @@ You can now change directories into the local repo, which will have the _default
     # You can verify the branch by examining the output of ...
     git status
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Git will add a [Git remote](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes) named `origin` to the clone's Git configuration that points to the cloned-from repo.  Because of this, the recommended convention is to clone your local repo(s) from your personal fork, thus making `origin` point to your fork.  This is assumed to be the case in other parts of the documentation.
 
 Next, add the OWP repo as a second [Git remote](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes) for the local clone.  Doing the addition will look something like:
@@ -78,7 +78,7 @@ Next, add the OWP repo as a second [Git remote](https://git-scm.com/book/en/v2/G
     # Verify
     git remote -v
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > The standard convention used in this doc and elsewhere is to name the Git remote for the official Github OWP repository `upstream`.  In regular text, that Git remote will always be denoted like this.
 >
 > Git also has the more general concept of an "upstream branch" associated with "tracking branches", as discussed on the [Git Remote Branches](https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches) documentation.  We will use "upstream branch" when discussing these.
@@ -126,7 +126,7 @@ Go ahead and push this new branch to your fork so it exists there as well.  Use 
     # Assuming the convention of your fork's remote being `origin`
     git push -u origin new_branch
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > While `-u` isn't strictly required, including it causes `origin/new_branch` to be set as the "upstream branch" for the local `new_branch` (with the latter being referred to as a "tracking branch").  Tracking branch relationships are described in the _Tracking Branches_ section of [Git's Remote Branches doc](https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches).
 >
 > While it is totally optional, parts our documentation - especially example commands - may assume this tracking branch relationship has been set.
@@ -149,13 +149,13 @@ To make sure the Python environment always reflects the current source code, ins
 
     # installing ngen.cal
     pip install -e 'python/ngen_cal[develop]'
-   
+
     # installing ngen.config
     pip install -e 'python/ngen_conf[develop]'
-   
+
     # installing ngen.init_config
     pip install -e 'python/ngen_init_config[develop]'
-   
+
     # installing ngen.config_gen
     pip install -e 'python/ngen_config_gen[develop]'
 
@@ -172,7 +172,7 @@ Especially if making more frequent, smaller commits as suggested above, it is a 
 
     # The fetch is probably unnecesssary unless you work from multiple local repos
     git fetch
-    
+
     # Assuming your branch of interest is still checked out:
     git status
 
