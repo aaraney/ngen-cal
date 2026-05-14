@@ -83,7 +83,7 @@ class Base(BaseModel):
         Normalize pint.Quantity inputs for unit-aware fields by validating compatibility,
         converting to declared units, and storing magnitudes only.
         """
-        fields = cls.__public_fields__
+        fields = cls.__public_fields__()
         for key, value in values.items():
             # NOTE: only perform unit validation / conversion when we encounter a pint.Quantity
             if isinstance(value, pint.Quantity):
@@ -113,7 +113,6 @@ class Base(BaseModel):
         return values
 
     @classmethod
-    @property
     @functools.lru_cache
     def __public_fields__(cls) -> typing.Mapping[str, pydantic.fields.ModelField]:
         """
