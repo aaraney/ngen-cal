@@ -1,0 +1,67 @@
+"general":
+  "iterations": 10
+  "log": true
+  "random_seed": 42
+  "start_iteration": 0
+  "strategy":
+    "algorithm": "dds"
+    "type": "estimation"
+  "workdir": "."
+"model":
+  "binary": "echo"
+  "args": "ngen args"
+  "eval_params":
+    "evaluation_start": "2015-12-01 00:00:00"
+    "evaluation_stop": "2015-12-01 23:00:00"
+    "objective": "nnse"
+    "target": "max"
+  "catchments": "../catchment_data.geojson"
+  "nexus": "../nexus_data.geojson"
+  "crosswalk": "../crosswalk.json"
+  "params":
+    "NoahOWP":
+    - "init": 8 # expect: 3
+      "max": 16
+      "min": 1
+      "name": "nom::both"
+      "scope": "both"
+      "transform": "math.log2"
+    - "init": 50
+      "max": 100
+      "min": 0.1
+      "name": "nom::cal"
+      "scope": "cal"
+    - "init": 1
+      "max": 5
+      "min": 0.18
+      "name": "nom::bmi"
+      "scope": "bmi"
+      "transform": "transforms.derive"
+      "transform_args":
+        "source": nom::cal
+    "TOPMODEL":
+    - "init": 1
+      "max": 1
+      "min": 0.7
+      "name": "topmodel::both"
+      "scope": "both"
+    - "init": 50
+      "max": 100
+      "min": 0.1
+      "name": "topmodel::cal"
+      "scope": "cal"
+    - "init": 1
+      "max": 5
+      "min": 0.18
+      "name": "topmodel::bmi"
+      "scope": "bmi"
+      "transform": "transforms.derive"
+      "transform_args":
+        "source": topmodel::cal
+  "plugins":
+  - "ngen.cal.ngen_hooks._testing.NgenCalZeroObs"
+  - "ngen.cal.ngen_hooks._testing.NgenCalZeroSim"
+  "realization": "./transform.json"
+  "routing_output": "troute_output_201510010000.nc"
+  "strategy": "uniform"
+  "type": "ngen"
