@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pydantic import FilePath, root_validator, BaseModel, Field
-from typing import Optional, Sequence, Mapping, Union
+from typing import Optional, Sequence, Mapping, Union, NamedTuple
 try: #to get literal in python 3.7, it was added to typing in 3.8
     from typing import Literal
 except ImportError:
@@ -23,7 +23,7 @@ import os
 from ngen.config.realization import NgenRealization, Realization, CatchmentRealization
 from ngen.config.multi import MultiBMI
 from .model import ModelExec, PosInt, Configurable
-from .parameter import Parameter, Parameters
+from .parameter import Scope, apply_transforms, Parameter, Parameters
 from .calibration_cathment import CalibrationCatchment, AdjustableCatchment
 from .calibration_set import CalibrationSet, UniformCalibrationSet
 #HyFeatures components
@@ -41,12 +41,15 @@ class NgenStrategy(str, Enum):
     independent = "independent"
 
 def _params_as_df(params: Mapping[str, Parameters], name: str = None):
+    def as_df(mod_name: str, ps: Parameters) -> pd.DataFrame:
+        df = pd.DataFrame([p.dict(by_alias=True, exclude={'scope', 'transform', 'transform_args'}) for p in ps])
+        df['model'] = mod_name
+        return df
+
     if not name:
         dfs = []
-        for k,v in params.items():
-            df = pd.DataFrame([s.__dict__ for s in v])
-            df['model'] = k
-            df.rename(columns={'name':'param'}, inplace=True)
+        for mod_name, ps in params.items():
+            df = as_df(mod_name, ps)
             dfs.append(df)
         df = pd.concat(dfs)
         # Copy the parameter column and use it as the index
@@ -55,11 +58,9 @@ def _params_as_df(params: Mapping[str, Parameters], name: str = None):
         df['p'] = df['param']
         return df.set_index('p')
     else:
-        p = params.get(name, [])
-        df = pd.DataFrame([s.__dict__ for s in p])
-        df['model'] = name
-        df.rename(columns={'name':'param'}, inplace=True)
-        if p:
+        ps = params.get(name, [])
+        df = as_df(name, ps)
+        if ps:
             df['p'] = df['param']
             return df.set_index('p')
         else:
@@ -86,6 +87,27 @@ class _HFVersion(enum.Enum):
     HF_2_0 = enum.auto()
     HF_2_1 = enum.auto()
     HF_2_2 = enum.auto()
+
+def _split_calibrated_and_derived_parameters(
+    parameters: Mapping[str, Parameters],
+) -> tuple[dict[str, Parameters], dict[str, Parameters]]:
+    """
+    splits calibrated and derived into separate dictionaries.
+    calibrated parameters have a scope of `Scope.Cal` or `Scope.Both`.
+    derived parameters have a scope of `Scope.Model`.
+    """
+    import collections
+
+    derived_params = collections.defaultdict(list)
+    calib_params = collections.defaultdict(list)
+    for model, params in parameters.items():
+        for param in params:
+            if param.scope == Scope.Bmi:
+                derived_params[model].append(param)
+            else:
+                calib_params[model].append(param)
+
+    return dict(calib_params), dict(derived_params)
 
 class NgenBase(ModelExec):
     """
@@ -116,6 +138,7 @@ class NgenBase(ModelExec):
     args: Optional[str]
 
     #private, not validated
+    _derived_params: Optional[Mapping[str, Parameters]] = None
     _catchments: Sequence[CalibrationCatchment] = []
     _catchment_hydro_fabric: gpd.GeoDataFrame
     _nexus_hydro_fabric: gpd.GeoDataFrame
@@ -156,6 +179,9 @@ class NgenBase(ModelExec):
         with open(self.realization) as fp:
             data = json.load(fp)
         self.ngen_realization = NgenRealization(**data)
+
+        if self.params:
+            self.params, self._derived_params = _split_calibrated_and_derived_parameters(self.params)
 
     def _register_default_ngen_plugins(self):
         from .ngen_hooks.ngen_output import TrouteOutput
@@ -418,7 +444,7 @@ class NgenBase(ModelExec):
                 "ngen realization `output_root` field is not supported by ngen.cal. will be removed in future; see https://github.com/NOAA-OWP/ngen-cal/issues/150"
             )
 
-    def update_config(self, i: int, params: pd.DataFrame, id: str = None, path=Path("./")):
+    def update_config(self, i: int, params: pd.DataFrame, id: str | None = None, path=Path("./")):
         """_summary_
 
         Args:
@@ -426,11 +452,36 @@ class NgenBase(ModelExec):
             params (pd.DataFrame): _description_
             id (str): _description_
         """
-
         if id is None: #Update global
             module = self.ngen_realization.global_config.formulations[0].params
         else: #update specific catchment
             module = self.ngen_realization.catchments[id].formulations[0].params
+
+        def build_ngen_module_param_mapping(
+            mod_name: str,
+            parameter_space: dict[str, float],
+            cal_params: Mapping[str, Parameters],
+            derived_params: Mapping[str, Parameters],
+        ) -> dict[str, float]:
+            import itertools
+            mod_calib_params = cal_params.get(mod_name, [])
+            mod_derived_params = derived_params.get(mod_name, [])
+
+            return apply_transforms(
+                parameter_space, itertools.chain(mod_calib_params, mod_derived_params)
+            )
+
+        calib_params = self.params or {}
+        derived_params = self._derived_params or {}
+
+        bmi_params: list[dict[str, str | float]] = []
+        def add_bmi_params(model_name: str, params: dict[str, float]) -> None:
+            bmi_params.extend(
+                [
+                    {"model": model_name, "param": param, "value": value}
+                    for param, value in params.items()
+                ]
+            )
 
         groups = params.set_index('param').groupby('model')
         if isinstance(module, MultiBMI):
@@ -438,12 +489,29 @@ class NgenBase(ModelExec):
                 name = m.params.model_name
                 if name in groups.groups:
                     p = groups.get_group(name)
-                    m.params.model_params = p[str(i)].to_dict()
+                    param_values = p[str(i)].to_dict()
+                    param_mapping = build_ngen_module_param_mapping(
+                        name, param_values, calib_params, derived_params
+                    )
+                    m.params.model_params = param_mapping
+                    add_bmi_params(name, param_mapping)
+
         else:
-            p = groups.get_group(module.model_name)
-            module.model_params = p[str(i)].to_dict()
+            name = module.model_name
+            p = groups.get_group(name)
+            param_values = p[str(i)].to_dict()
+            param_mapping = build_ngen_module_param_mapping(
+                name, param_values, calib_params, derived_params
+            )
+            module.model_params = param_mapping
+            add_bmi_params(name, param_mapping)
+
         with open(path/self.realization.name, 'w') as fp:
-                fp.write( self.ngen_realization.json(by_alias=True, exclude_none=True, indent=4))
+            fp.write( self.ngen_realization.json(by_alias=True, exclude_none=True, indent=4))
+
+        bmi_params_df = pd.DataFrame(bmi_params)
+        # write parameter values set over bmi to file
+        self.log_bmi_parameter_space(i, id, bmi_params_df, path)
         # Cleanup any t-route parquet files between runs
         # TODO this may not be _the_ best place to do this, but for now,
         # it works, so here it be...
@@ -458,6 +526,28 @@ class NgenBase(ModelExec):
         )
         for file in itertools.chain(*to_remove):
             file.unlink()
+
+    @staticmethod
+    def bmi_parameter_space_filename(id: str | None) -> Path:
+        id = id or "global"
+        return Path(f"ngen_cal_{id}_bmi_parameter_df_state.parquet")
+
+    @staticmethod
+    def log_bmi_parameter_space(
+        i: int, id: str | None, params_df: pd.DataFrame, path: Path = Path("./")
+    ):
+        """
+        DataFrame like:
+        columns: model, param, value
+        """
+        if params_df.empty:
+            return
+        join_cols = ["model", "param"]
+        path = path / NgenBase.bmi_parameter_space_filename(id)
+        df = pd.read_parquet(path) if path.exists() else pd.DataFrame(columns=join_cols)
+        params_df = params_df.rename(columns={"value": int(i)})
+        df = pd.merge(df, params_df, on=join_cols, how="outer")
+        df.to_parquet(path)
 
 class NgenExplicit(NgenBase):
 
