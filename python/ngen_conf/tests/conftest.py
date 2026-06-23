@@ -29,6 +29,7 @@ _snow17_config_path = _datadir / "init_config_data" / "snow17.namelist"
 _snow17_params_config_path = _datadir / "init_config_data" / "snow17_params.txt"
 _sacsma_config_path = _datadir / "init_config_data" / "sacsma.namelist"
 _sacsma_params_config_path = _datadir / "init_config_data" / "sacsma_params.txt"
+_cfe3_config_data_path = _datadir / "init_config_data" / "cfe3_bmi_config.cf3"
 
 
 """
@@ -214,6 +215,11 @@ def multi_params(cfe, noahowp):
 def cfe_init_config() -> str:
     # drop eol char
     return _cfe_config_data_path.read_text().rstrip()
+
+@pytest.fixture
+def cfe3_init_config() -> str:
+    # drop eol char
+    return _cfe3_config_data_path.read_text().rstrip()
 
 @pytest.fixture
 def pet_init_config() -> str:

@@ -6,6 +6,7 @@ import pytest
 from ngen.init_config import utils
 
 from ngen.config.init_config.cfe import CFE
+from ngen.config.init_config.cfe3 import CFE3
 from ngen.config.init_config.casam import Casam
 from ngen.config.init_config.noahowp import NoahOWP
 from ngen.config.init_config.pet import PET
@@ -26,6 +27,14 @@ def test_cfe(cfe_init_config: str):
     assert utils.merge_class_attr(CFE, "Config.no_section_headers") is True
     o = CFE.from_ini_str(cfe_init_config)
     assert o.to_ini_str() == cfe_init_config
+
+
+def test_cfe3(cfe3_init_config: str):
+    assert utils.merge_class_attr(CFE3, "Config.space_around_delimiters") is False
+    assert utils.merge_class_attr(CFE3, "Config.no_section_headers") is True
+    assert utils.merge_class_attr(CFE3, "Config.preserve_key_case") is True
+    o = CFE3.from_ini_str(cfe3_init_config)
+    assert o.to_ini_str() == cfe3_init_config
 
 
 def test_pet(pet_init_config: str):
