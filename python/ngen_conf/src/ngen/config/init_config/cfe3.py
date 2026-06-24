@@ -258,7 +258,7 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     # Xinanjiang (conditional - only used when partitioning_scheme_name=XINANJIANG)
-    partitioning_xinanjiang_tension_water_inflection_point: Optional[float] = None
+    partitioning_xinanjiang_tension_water_inflection_point: Optional[float] = Field(None, gte=0.001, lte=0.017)
     """Xinanjiang tension water inflection point parameter.
 
     units: -
