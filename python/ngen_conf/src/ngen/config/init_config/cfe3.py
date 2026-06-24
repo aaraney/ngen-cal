@@ -110,10 +110,10 @@ class CFE3(serde.IniSerializerDeserializer):
     units: m
     """
 
-    catchment_area_km2: Optional[float] = Field(default=None, units="km2")
+    catchment_area_km2: Optional[float] = Field(default=None, units="km**2")
     """Catchment area.
 
-    units: km2
+    units: km**2
     """
 
     catchment_impervious_fraction_0_1: float = Field(default=0.0, ge=0, le=1)
