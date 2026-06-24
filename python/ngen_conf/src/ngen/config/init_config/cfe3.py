@@ -71,7 +71,7 @@ class CFE3(serde.IniSerializerDeserializer):
     units: -
     """
 
-    control_ET_deepest_root_zone_discretization: int = Field(default=4, ge=1)
+    control_et_deepest_root_zone_discretization: int = Field(default=4, ge=1)
     """Deepest root zone discretization for ET calculation.
 
     units: -
@@ -131,7 +131,7 @@ class CFE3(serde.IniSerializerDeserializer):
     bounds: > 0
     """
 
-    soil_Clapp_Hornberger_exponent_b: float
+    soil_clapp_hornberger_exponent_b: float
     """Clapp-Hornberger exponent for soil water retention curve.
 
     units: -
@@ -258,14 +258,14 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     # Xinanjiang (conditional - only used when partitioning_scheme_name=XINANJIANG)
-    partitioning_Xinanjiang_tension_water_inflection_point: Optional[float] = None
+    partitioning_xinanjiang_tension_water_inflection_point: Optional[float] = None
     """Xinanjiang tension water inflection point parameter.
 
     units: -
     bounds: 0-1
     """
 
-    partitioning_Xinanjiang_tension_water_soil_moist_distrib_exponent: Optional[
+    partitioning_xinanjiang_tension_water_soil_moist_distrib_exponent: Optional[
         float
     ] = None
     """Xinanjiang tension water soil moisture distribution exponent.
@@ -274,7 +274,7 @@ class CFE3(serde.IniSerializerDeserializer):
     bounds: >= 0
     """
 
-    partitioning_Xinanjiang_free_water_soil_moist_distrib_exponent: Optional[
+    partitioning_xinanjiang_free_water_soil_moist_distrib_exponent: Optional[
         float
     ] = None
     """Xinanjiang free water soil moisture distribution exponent.
@@ -331,107 +331,29 @@ class CFE3(serde.IniSerializerDeserializer):
 
         fields = {
             # Catchment metadata
-            "catchment_id": {"alias": "catchment_id"},
-            "catchment_latitude_decimal_degree": {
-                "alias": "catchment_latitude_decimal_degree"
-            },
-            "catchment_longitude_decimal_degree": {
-                "alias": "catchment_longitude_decimal_degree"
-            },
-            "catchment_elevation": {"alias": "catchment_elevation"},
-            "catchment_area_km2": {"alias": "catchment_area_km2"},
             "catchment_impervious_fraction_0_1": {
                 "alias": "catchment_impervious_fraction_0-1"
             },
             # Controls
-            "cfe_config_version": {"alias": "cfe_config_version"},
-            "control_model_timestep_h": {"alias": "control_model_timestep_h"},
-            "control_input_forcing_filename": {
-                "alias": "control_input_forcing_filename"
-            },
-            "control_total_num_simulation_timesteps": {
-                "alias": "control_total_num_simulation_timesteps"
-            },
-            "control_verbosity": {"alias": "control_verbosity"},
-            "control_soil_simulate_freeze_thaw_true_false": {
-                "alias": "control_soil_simulate_freeze_thaw_true_false"
-            },
-            "control_soil_simulate_discrete_soil_moisture_true_false": {
-                "alias": "control_soil_simulate_discrete_soil_moisture_true_false"
-            },
-            "control_ET_deepest_root_zone_discretization": {
+            "control_et_deepest_root_zone_discretization": {
                 "alias": "control_ET_deepest_root_zone_discretization"
             },
-            "control_soil_use_lookup_table_num_points": {
-                "alias": "control_soil_use_lookup_table_num_points"
-            },
             # Soil
-            "soil_depth_m": {"alias": "soil_depth_m"},
-            "soil_Clapp_Hornberger_exponent_b": {
+            "soil_clapp_hornberger_exponent_b": {
                 "alias": "soil_Clapp_Hornberger_exponent_b"
-            },
-            "soil_sat_hydraulic_conductivity_cm_per_h": {
-                "alias": "soil_sat_hydraulic_conductivity_cm_per_h"
-            },
-            "soil_sat_capillary_head_cm": {
-                "alias": "soil_sat_capillary_head_cm"
-            },
-            "soil_effective_porosity": {"alias": "soil_effective_porosity"},
-            "soil_wilting_point_moisture_content": {
-                "alias": "soil_wilting_point_moisture_content"
-            },
-            "soil_field_capacity_Pcap_over_Patm_0_1": {
-                "alias": "soil_field_capacity_Pcap_over_Patm_0_1"
-            },
-            "soil_ice_content_impervious_threshold": {
-                "alias": "soil_ice_content_impervious_threshold"
-            },
-            "soil_reservoir_rate_const_to_subsurface_lateral_flow": {
-                "alias": "soil_reservoir_rate_const_to_subsurface_lateral_flow"
             },
             "soil_to_gw_percolation_rate_limiter_0_1": {
                 "alias": "soil_to_gw_percolation_rate_limiter_0_to_1"
             },
-            # State
-            "state_soil_reservoir_init_storage_m": {
-                "alias": "state_soil_reservoir_init_storage_m"
-            },
-            "state_gw_reservoir_init_storage_m": {
-                "alias": "state_gw_reservoir_init_storage_m"
-            },
-            "state_surface_routing_init_giuh_convolution_queue_m": {
-                "alias": "state_surface_routing_init_giuh_convolution_queue_m"
-            },
-            "state_subsurface_routing_init_nash_cascade_storage_m": {
-                "alias": "state_subsurface_routing_init_nash_cascade_storage_m"
-            },
-            # Groundwater
-            "gw_reservoir_max_storage_m": {"alias": "gw_reservoir_max_storage_m"},
-            "gw_discharge_coeff_m_per_timestep": {
-                "alias": "gw_discharge_coeff_m_per_timestep"
-            },
-            "gw_discharge_exponent": {"alias": "gw_discharge_exponent"},
             # Partitioning
-            "partitioning_scheme_name": {"alias": "partitioning_scheme_name"},
-            "partitioning_Xinanjiang_tension_water_inflection_point": {
+            "partitioning_xinanjiang_tension_water_inflection_point": {
                 "alias": "partitioning_Xinanjiang_tension_water_inflection_point"
             },
-            "partitioning_Xinanjiang_tension_water_soil_moist_distrib_exponent": {
+            "partitioning_xinanjiang_tension_water_soil_moist_distrib_exponent": {
                 "alias": "partitioning_Xinanjiang_tension_water_soil_moist_distrib_exponent"
             },
-            "partitioning_Xinanjiang_free_water_soil_moist_distrib_exponent": {
+            "partitioning_xinanjiang_free_water_soil_moist_distrib_exponent": {
                 "alias": "partitioning_Xinanjiang_free_water_soil_moist_distrib_exponent"
-            },
-            # Surface Routing
-            "surface_routing_num_giuh_ordinates": {
-                "alias": "surface_routing_num_giuh_ordinates"
-            },
-            "surface_routing_giuh_ordinates": {
-                "alias": "surface_routing_giuh_ordinates"
-            },
-            # Subsurface Routing
-            "subsurface_routing_nash_reservoir_time_constant_k": {
-                "alias": "subsurface_routing_nash_reservoir_time_constant_k"
             },
         }
 
