@@ -104,7 +104,7 @@ class CFE3(serde.IniSerializerDeserializer):
     units: decimal_degree
     """
 
-    catchment_elevation: Optional[float] = Field(default=None, units="m")
+    catchment_elevation: Optional[float] = Field(default=None, units="CommonUnits.Meter")
     """Catchment elevation.
 
     units: m
@@ -124,7 +124,7 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     # Soil
-    soil_depth_m: float = Field(units="m")
+    soil_depth_m: float = Field(units="CommonUnits.Meter")
     """Soil depth.
 
     units: m
@@ -196,14 +196,14 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     # State (initial conditions)
-    state_soil_reservoir_init_storage_m: float = Field(units="m")
+    state_soil_reservoir_init_storage_m: float = Field(units="CommonUnits.Meter")
     """Initial soil reservoir storage.
 
     units: m
     bounds: >= 0
     """
 
-    state_gw_reservoir_init_storage_m: float = Field(units="m")
+    state_gw_reservoir_init_storage_m: float = Field(units="CommonUnits.Meter")
     """Initial groundwater reservoir storage.
 
     units: m
@@ -211,7 +211,7 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     state_surface_routing_init_giuh_convolution_queue_m: CSList[float] = Field(
-        units="m"
+        units="CommonUnits.Meter"
     )
     """Initial GIUH convolution queue storage (one value per GIUH ordinate).
 
@@ -220,7 +220,7 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     state_subsurface_routing_init_nash_cascade_storage_m: CSList[float] = Field(
-        units="m"
+        units="CommonUnits.Meter"
     )
     """Initial subsurface routing Nash cascade storage.
 
@@ -229,7 +229,7 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     # Groundwater
-    gw_reservoir_max_storage_m: float = Field(units="m")
+    gw_reservoir_max_storage_m: float = Field(units="CommonUnits.Meter")
     """Maximum groundwater reservoir storage.
 
     units: m
