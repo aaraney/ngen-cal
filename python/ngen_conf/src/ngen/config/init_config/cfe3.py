@@ -353,24 +353,7 @@ class CFE3(serde.IniSerializerDeserializer):
             },
         }
 
-    def dict(
-        self,
-        *,
-        include: AbstractSetIntStr | MappingIntStrAny | None = None,
-        exclude: AbstractSetIntStr | MappingIntStrAny | None = None,
-        by_alias: bool = False,
-        skip_defaults: bool | None = None,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-    ) -> DictStrAny:
-        """Override dict to exclude None values by default."""
-        return super().dict(
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none or True,
-        )
+    def to_ini_str(self) -> str:
+        """Override to_ini_str to exclude None values when writing CFE config files."""
+        data = self.dict(by_alias=True, exclude_none=True)
+        return self._to_ini_str(data)
