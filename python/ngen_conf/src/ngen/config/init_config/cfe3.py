@@ -307,16 +307,15 @@ class CFE3(serde.IniSerializerDeserializer):
     @root_validator
     def validate_giuh_convolution_queue_length(cls, values):
         """Validate that GIUH convolution queue length matches number of ordinates."""
-        num_ordinates = values.get("surface_routing_num_giuh_ordinates")
-        queue = values.get("state_surface_routing_init_giuh_convolution_queue_m")
-        if num_ordinates is not None and queue is not None:
-            # CSList stores data in __root__
-            queue_list = queue.__root__ if hasattr(queue, "__root__") else queue
-            if len(queue_list) != num_ordinates:
-                raise ValueError(
-                    f"GIUH convolution queue length ({len(queue_list)}) must match "
-                    f"number of GIUH ordinates ({num_ordinates})"
-                )
+        num_ordinates = values["surface_routing_num_giuh_ordinates"]
+        queue = values["state_surface_routing_init_giuh_convolution_queue_m"]
+        # CSList stores data in __root__
+        queue_list = queue.__root__ if hasattr(queue, "__root__") else queue
+        if len(queue_list) != num_ordinates:
+            raise ValueError(
+                f"GIUH convolution queue length ({len(queue_list)}) must match "
+                f"number of GIUH ordinates ({num_ordinates})"
+            )
         return values
 
     class Config(serde.IniSerializerDeserializer.Config):
