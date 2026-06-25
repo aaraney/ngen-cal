@@ -265,18 +265,14 @@ class CFE3(serde.IniSerializerDeserializer):
     bounds: 0-1
     """
 
-    partitioning_xinanjiang_tension_water_soil_moist_distrib_exponent: Optional[
-        float
-    ] = None
+    partitioning_xinanjiang_tension_water_soil_moist_distrib_exponent: Optional[float] = Field(None, gte=0)
     """Xinanjiang tension water soil moisture distribution exponent.
 
     units: -
     bounds: >= 0
     """
 
-    partitioning_xinanjiang_free_water_soil_moist_distrib_exponent: Optional[
-        float
-    ] = None
+    partitioning_xinanjiang_free_water_soil_moist_distrib_exponent: Optional[float] = Field(None, gte=0)
     """Xinanjiang free water soil moisture distribution exponent.
 
     units: -
@@ -284,7 +280,7 @@ class CFE3(serde.IniSerializerDeserializer):
     """
 
     # Surface Routing (GIUH only)
-    surface_routing_num_giuh_ordinates: int
+    surface_routing_num_giuh_ordinates: int = Field(gt=0)
     """Number of GIUH ordinates.
 
     units: -
