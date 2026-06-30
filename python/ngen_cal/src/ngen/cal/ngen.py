@@ -87,6 +87,7 @@ class _HFVersion(enum.Enum):
     HF_2_0 = enum.auto()
     HF_2_1 = enum.auto()
     HF_2_2 = enum.auto()
+    HF_4_0 = enum.auto()
 
 def _split_calibrated_and_derived_parameters(
     parameters: Mapping[str, Parameters],
@@ -170,6 +171,8 @@ class NgenBase(ModelExec):
                 self._read_gpkg_hydrofabric_2_1()
             elif hf_version == _HFVersion.HF_2_2:
                 self._read_gpkg_hydrofabric_2_2()
+            elif hf_version == _HFVersion.HF_4_0:
+                self._read_gpkg_hydrofabric_4_0()
             else:
                 raise RuntimeError("unreachable")
         else:
@@ -208,7 +211,10 @@ class NgenBase(ModelExec):
         # hydrofabric <= 2.1 use 'flowpaths' AND 'flowpath_attributes'
         # hydrofabric >= 2.1; < 2.2 use 'flowlines' AND 'flowpath-attributes'
         # hydrofabric >= 2.2 use 'flowpaths' AND 'flowpath-attributes'
-        if {"flowpaths", "flowpath_attributes"} == values:
+        # hydrofabric >= 4 has 'flowpaths' AND 'flowlines'
+        if {"flowlines", "flowpaths"}.issubset(values):
+            return _HFVersion.HF_4_0
+        elif {"flowpaths", "flowpath_attributes"} == values:
             return _HFVersion.HF_2_0
         elif {"flowlines", "flowpath-attributes"} == values:
             return _HFVersion.HF_2_1
@@ -216,6 +222,50 @@ class NgenBase(ModelExec):
             return _HFVersion.HF_2_2
         else:
             raise KeyError(f"could not determine HF version. debug information: {values!s}")
+
+    def _read_gpkg_hydrofabric_4_0(self) -> None:
+        def replace_fp_with_wb(s: pd.Series) -> pd.Series:
+            """ngen.cal uses wb- as the flowpath prefix internally"""
+            return s.str.replace("fp-", "wb-", 1)
+        # Read geopackage hydrofabric
+        self._catchment_hydro_fabric = gpd.read_file(self.hydrofabric, layer="divides")
+        self._catchment_hydro_fabric["flowpath_id"] = replace_fp_with_wb(self._catchment_hydro_fabric["flowpath_id"])
+        self._catchment_hydro_fabric.rename(
+            columns={"flowpath_toid": "toid", "flowpath_id": "id"}, inplace=True
+        )
+        self._catchment_hydro_fabric.set_index("divide_id", inplace=True)
+
+        self._nexus_hydro_fabric = gpd.read_file(self.hydrofabric, layer="nexus")
+        # hydrofabric >= 4.0 use 'nexus_id'
+        self._nexus_hydro_fabric["nexus_toid"] = replace_fp_with_wb(self._nexus_hydro_fabric["nexus_toid"])
+        self._nexus_hydro_fabric.rename(
+            columns={"nexus_id": "id", "nexus_toid": "toid"}, inplace=True
+        )
+        self._nexus_hydro_fabric.set_index("id", inplace=True)
+
+        self._flowpath_hydro_fabric = gpd.read_file(self.hydrofabric, layer="flowpaths")
+        self._flowpath_hydro_fabric["flowpath_id"] = replace_fp_with_wb(self._flowpath_hydro_fabric["flowpath_id"])
+        self._flowpath_hydro_fabric.rename(
+            columns={"flowpath_id": "id", "flowpath_toid": "toid"}, inplace=True
+        )
+        self._flowpath_hydro_fabric.set_index("id", inplace=True)
+
+        attributes = gpd.read_file(self.hydrofabric, layer="flowpath-attributes")
+        attributes["flowpath_id"] = replace_fp_with_wb(attributes["flowpath_id"])
+        # hydrofabric >= 4.0 use 'flowpath_id'
+        attributes.set_index("flowpath_id", inplace=True)
+        # like:
+        # lid-WCLN3,nwis-01152500,lid-WCLN3
+        # want: 01152500
+
+        hl_reference: pd.Series = attributes["hl_reference"]
+        has_gage = hl_reference.str.contains("nwis-")
+        split = hl_reference[has_gage].str.split(",")
+        only_gages = split.apply(
+            lambda r: [x[len("nwis-") :] for x in set(r) if x.startswith("nwis-")]
+        )
+
+        self._x_walk = only_gages.explode()
 
     def _read_gpkg_hydrofabric_2_2(self) -> None:
         # Read geopackage hydrofabric
