@@ -4,6 +4,7 @@ from typing import Type
 from ngen.config.formulation import Formulation
 
 from ngen.config.cfe import CFE
+from ngen.config.cfe3 import CFE3
 from ngen.config.sloth import SLOTH
 from ngen.config.topmod import Topmod
 from ngen.config.noahowp import NoahOWP
@@ -12,6 +13,7 @@ from ngen.config.multi import MultiBMI
 
 fixture_expected_type = (
     ("cfe_params", CFE),
+    ("cfe3_params", CFE3),
     ("sloth_params", SLOTH),
     ("topmod_params", Topmod),
     ("noahowp_params", NoahOWP),
@@ -35,6 +37,7 @@ def test_correct_forumulation_subtype_is_deserialized(
 
 initialized_fixture_expected_type = (
     ("cfe", CFE),
+    ("cfe3", CFE3),
     ("sloth", SLOTH),
     ("topmod", Topmod),
     ("noahowp", NoahOWP),
