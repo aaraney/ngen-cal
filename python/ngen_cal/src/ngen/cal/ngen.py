@@ -595,7 +595,32 @@ class NgenBase(ModelExec):
         join_cols = ["model", "param"]
         path = path / NgenBase.bmi_parameter_space_filename(id)
         df = pd.read_parquet(path) if path.exists() else pd.DataFrame(columns=join_cols)
-        params_df = params_df.rename(columns={"value": int(i)})
+        # NOTE: this is a str _not_ an int
+        col_name = str(i)
+        params_df = params_df.rename(columns={"value": col_name})
+        # SAFETY: in the case of restart, we may be trying to insert a column
+        # that already exists. if that is the case, drop the previously
+        # recorded column in favor of the new one. they should be equal,
+        # but we cannot guarantee that. e.g. a non-deterministic derived
+        # parameter.
+        if col_name in df:
+            if not (df[col_name] == params_df[col_name]).all():
+                previous_values = df[join_cols + [col_name]].to_string(index=False)
+                new_values = params_df[join_cols + [col_name]].to_string(index=False)
+                warnings.warn(
+                    f"BMI parameter values for iteration {col_name} "
+                    f"in '{path.name!s}' already exist and differ from the newly "
+                    f"computed values; overwriting the previously recorded "
+                    f"column. This can occur on restart. e.g. a non-deterministic "
+                    f"derived parameters. Ensure this behavior is intended.\n"
+                    f"Parameter path: '{path!s}'\n"
+                    f"Previous values:\n"
+                    f"{previous_values}\n"
+                    f"New values:\n"
+                    f"{new_values}",
+                    stacklevel=2,
+                )
+            df = df.drop(columns=[col_name])
         df = pd.merge(df, params_df, on=join_cols, how="outer")
         df.to_parquet(path)
 
