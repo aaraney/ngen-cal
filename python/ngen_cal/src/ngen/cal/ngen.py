@@ -226,6 +226,9 @@ class NgenBase(ModelExec):
     def _read_gpkg_hydrofabric_4_0(self) -> None:
         def replace_fp_with_wb(s: pd.Series) -> pd.Series:
             """ngen.cal uses wb- as the flowpath prefix internally"""
+            # ignore if this is non-string. e.g. nexus table nexus_toid is null
+            if not pd.api.types.is_string_dtype(s):
+                return s
             return s.str.replace("fp-", "wb-", 1)
         # Read geopackage hydrofabric
         self._catchment_hydro_fabric = gpd.read_file(self.hydrofabric, layer="divides")
