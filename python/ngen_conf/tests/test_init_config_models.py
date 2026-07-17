@@ -3,9 +3,11 @@ from __future__ import annotations
 import warnings
 
 import pytest
+from pydantic import ValidationError
 from ngen.init_config import utils
 
 from ngen.config.init_config.cfe import CFE
+from ngen.config.init_config.cfe3 import CFE3
 from ngen.config.init_config.casam import Casam
 from ngen.config.init_config.noahowp import NoahOWP
 from ngen.config.init_config.pet import PET
@@ -26,6 +28,27 @@ def test_cfe(cfe_init_config: str):
     assert utils.merge_class_attr(CFE, "Config.no_section_headers") is True
     o = CFE.from_ini_str(cfe_init_config)
     assert o.to_ini_str() == cfe_init_config
+
+
+def test_cfe3(cfe3_init_config: str):
+    assert utils.merge_class_attr(CFE3, "Config.space_around_delimiters") is False
+    assert utils.merge_class_attr(CFE3, "Config.no_section_headers") is True
+    assert utils.merge_class_attr(CFE3, "Config.preserve_key_case") is True
+    o = CFE3.from_ini_str(cfe3_init_config)
+    assert o.to_ini_str() == cfe3_init_config
+
+
+def test_cfe3_init_giuh_convolution_queue_length_mismatch(cfe3_init_config: str):
+    """GIUH convolution queue length must match surface_routing_num_giuh_ordinates."""
+    # Use the test config but change the convolution queue to have 2 elements
+    # instead of 5 (num_giuh_ordinates=5), triggering the validator.
+    ini = cfe3_init_config.replace(
+        "state_surface_routing_init_giuh_convolution_queue_m=0.0,0.0,0.0,0.0,0.0",
+        "state_surface_routing_init_giuh_convolution_queue_m=0.0,0.0",
+    )
+    with pytest.raises(ValidationError) as exc_info:
+        CFE3.from_ini_str(ini)
+    assert "GIUH convolution queue length" in str(exc_info.value)
 
 
 def test_pet(pet_init_config: str):

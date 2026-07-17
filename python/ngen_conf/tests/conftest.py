@@ -3,6 +3,7 @@ from pathlib import Path
 from ngen.config.configurations import Forcing, Time, Routing
 from ngen.config.formulation import Formulation
 from ngen.config.cfe import CFE
+from ngen.config.cfe3 import CFE3
 from ngen.config.sloth import SLOTH
 from ngen.config.noahowp import NoahOWP
 from ngen.config.lgar import LGAR
@@ -29,6 +30,7 @@ _snow17_config_path = _datadir / "init_config_data" / "snow17.namelist"
 _snow17_params_config_path = _datadir / "init_config_data" / "snow17_params.txt"
 _sacsma_config_path = _datadir / "init_config_data" / "sacsma.namelist"
 _sacsma_params_config_path = _datadir / "init_config_data" / "sacsma_params.txt"
+_cfe3_config_data_path = _datadir / "init_config_data" / "cfe3_bmi_config.cf3"
 
 
 """
@@ -67,6 +69,22 @@ def cfe_params():
             'library_prefix':path,
             'library': 'libfakecfe.so',
             'model_params':{'slope':0.42, 'expon':42}}
+    return data
+
+@pytest.fixture
+def cfe3_params():
+    path = _workdir.joinpath("data/CFE/")
+    data = {
+            'model_type_name': 'CFE3',
+            'name': 'bmi_c',
+            'config_prefix':path,
+            'config': "config.cf3",
+            'library_prefix':path,
+            'library': 'libcfebmi.so',
+            'model_params':{
+                'soil_percolation_rate_limiter': 0.81,
+                'gw_discharge_exponent': 6
+            }}
     return data
 
 @pytest.fixture
@@ -165,6 +183,10 @@ def cfe(cfe_params):
     return CFE(**cfe_params)
 
 @pytest.fixture
+def cfe3(cfe3_params):
+    return CFE3(**cfe3_params)
+
+@pytest.fixture
 def sloth(sloth_params):
     return SLOTH(**sloth_params)
 
@@ -214,6 +236,11 @@ def multi_params(cfe, noahowp):
 def cfe_init_config() -> str:
     # drop eol char
     return _cfe_config_data_path.read_text().rstrip()
+
+@pytest.fixture
+def cfe3_init_config() -> str:
+    # drop eol char
+    return _cfe3_config_data_path.read_text().rstrip()
 
 @pytest.fixture
 def pet_init_config() -> str:
