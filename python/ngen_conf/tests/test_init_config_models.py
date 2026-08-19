@@ -7,6 +7,7 @@ from ngen.init_config import utils
 
 from ngen.config.init_config.cfe import CFE
 from ngen.config.init_config.casam import Casam
+from ngen.config.init_config.dhbv2 import Dhbv2Mts
 from ngen.config.init_config.noahowp import NoahOWP
 from ngen.config.init_config.pet import PET
 from ngen.config.init_config.soil_freeze_thaw import SoilFreezeThaw
@@ -127,6 +128,12 @@ def test_soil_moisture_profile(soil_moisture_profile_init_config: str):
 def test_casam(casam_init_config: str):
     o = Casam.from_ini_str(casam_init_config)
     assert o.to_ini_str() == casam_init_config
+
+
+def test_dhbv2(dhbv2_init_config: str):
+    o = Dhbv2Mts.from_yaml_str(dhbv2_init_config)
+    assert o.to_yaml_str() == dhbv2_init_config
+    assert o.catchment_id == "cat-27"
 
 
 def test_topmodel_subcat(topmodel_subcat_config: str):
