@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import Optional
+
+from ngen.init_config import format_serializers
 from ngen.init_config import serializer_deserializer as serde
 from ngen.init_config.units import CommonUnits, Field
 
@@ -10,67 +13,71 @@ class Dhbv2Mts(serde.YamlSerializerDeserializer):
 
     Source: https://github.com/mhpi/dhbv2
 
-    Field names match the BMI config keys. Static attributes without
-    an input data source are emitted as 0.0; the BMI defaults missing
-    static attributes to 0.0, so these act as explicit placeholders.
+    Field names match the BMI config keys. Fields present in the input
+    data are emitted; absent fields are excluded from output. The BMI
+    initializes unset static variables to 0.0 and normalizes them
+    against training statistics.
     """
 
-    aridity: float = Field(0.0, units=CommonUnits.Dimensionless, description="aridity index")
+    aridity: Optional[float] = Field(None, units=CommonUnits.Dimensionless, description="aridity index")
     # NOTE: the BMI source (mts_bmi.py _static_input_vars) declares meanP and ETPOT_Hargr
     # as `mm d-1`, but the model was trained on annual values based on the
     # normalization statistics (meanP ~1,000,
     # ETPOT_Hargr ~1,000 — plausible as mm/yr, not mm/d).
     # Pass annual values in mm yr-1; do not convert to daily.
-    meanP: float = Field(0.0, units="mm/year", description="mean annual precipitation")
-    ETPOT_Hargr: float = Field(0.0, units="mm/year", description="Hargreaves PET")
-    NDVI: float = Field(
-        0.0, units=CommonUnits.Dimensionless, description="normalized difference vegetation index"
+    meanP: Optional[float] = Field(None, units="mm/year", description="mean annual precipitation")
+    ETPOT_Hargr: Optional[float] = Field(None, units="mm/year", description="Hargreaves PET")
+    NDVI: Optional[float] = Field(
+        None, units=CommonUnits.Dimensionless, description="normalized difference vegetation index"
     )
-    FW: float = Field(0.0, units="mm/day", description="free water")
+    FW: Optional[float] = Field(None, units="mm/day", description="free water")
 
-    meanslope: float = Field(0.0, units="meter/kilometer", description="basin mean slope")
-    meanelevation: float = Field(0.0, units=CommonUnits.Meter, description="basin mean elevation")
+    meanslope: Optional[float] = Field(None, units="meter/kilometer", description="basin mean slope")
+    meanelevation: Optional[float] = Field(None, units=CommonUnits.Meter, description="basin mean elevation")
 
-    meanTa: float = Field(0.0, units="degC", description="mean annual temperature")
-    seasonality_P: float = Field(
-        0.0, units=CommonUnits.Dimensionless, description="precipitation seasonality"
+    meanTa: Optional[float] = Field(None, units="degC", description="mean annual temperature")
+    seasonality_P: Optional[float] = Field(
+        None, units=CommonUnits.Dimensionless, description="precipitation seasonality"
     )
-    seasonality_PET: float = Field(
-        0.0, units=CommonUnits.Dimensionless, description="PET seasonality"
-    )
-
-    SoilGrids1km_sand: float = Field(0.0, units="percent")
-    SoilGrids1km_clay: float = Field(0.0, units="percent")
-    SoilGrids1km_silt: float = Field(0.0, units="percent")
-
-    HWSD_clay: float = Field(0.0, units="percent")
-    HWSD_gravel: float = Field(0.0, units="percent")
-    HWSD_sand: float = Field(0.0, units="percent")
-    HWSD_silt: float = Field(0.0, units="percent")
-
-    T_clay: float = Field(0.0, units="percent")
-    T_gravel: float = Field(0.0, units="percent")
-    T_sand: float = Field(0.0, units="percent")
-    T_silt: float = Field(0.0, units="percent")
-
-    glaciers: float = Field(0.0, units="percent", description="glacier fraction")
-    permafrost: float = Field(
-        0.0, units=CommonUnits.Dimensionless, description="permafrost fraction"
-    )
-    snow_fraction: float = Field(0.0, units="percent", description="snow fraction")
-    snowfall_fraction: float = Field(0.0, units="percent", description="snowfall fraction")
-
-    permeability: float = Field(0.0, units="meter**2", description="bedrock permeability")
-    Porosity: float = Field(
-        0.0, units=CommonUnits.Dimensionless, description="active-layer porosity"
+    seasonality_PET: Optional[float] = Field(
+        None, units=CommonUnits.Dimensionless, description="PET seasonality"
     )
 
-    uparea: float = Field(0.0, units="kilometer**2", description="upstream area")
-    catchsize: float = Field(0.0, units="kilometer**2", description="catchment area")
-    lengthkm: float = Field(0.0, units="kilometer", description="stream network length")
+    SoilGrids1km_sand: Optional[float] = Field(None, units="percent")
+    SoilGrids1km_clay: Optional[float] = Field(None, units="percent")
+    SoilGrids1km_silt: Optional[float] = Field(None, units="percent")
+
+    HWSD_clay: Optional[float] = Field(None, units="percent")
+    HWSD_gravel: Optional[float] = Field(None, units="percent")
+    HWSD_sand: Optional[float] = Field(None, units="percent")
+    HWSD_silt: Optional[float] = Field(None, units="percent")
+
+    T_clay: Optional[float] = Field(None, units="percent")
+    T_gravel: Optional[float] = Field(None, units="percent")
+    T_sand: Optional[float] = Field(None, units="percent")
+    T_silt: Optional[float] = Field(None, units="percent")
+
+    glaciers: Optional[float] = Field(None, units="percent", description="glacier fraction")
+    permafrost: Optional[float] = Field(
+        None, units=CommonUnits.Dimensionless, description="permafrost fraction"
+    )
+    snow_fraction: Optional[float] = Field(None, units="percent", description="snow fraction")
+    snowfall_fraction: Optional[float] = Field(None, units="percent", description="snowfall fraction")
+
+    permeability: Optional[float] = Field(None, units="meter**2", description="bedrock permeability")
+    Porosity: Optional[float] = Field(
+        None, units=CommonUnits.Dimensionless, description="active-layer porosity"
+    )
+
+    uparea: Optional[float] = Field(None, units="kilometer**2", description="upstream area")
+    catchsize: Optional[float] = Field(None, units="kilometer**2", description="catchment area")
+    lengthkm: Optional[float] = Field(None, units="kilometer", description="stream network length")
 
     model_dir: str = "/home/ec2-user/models/dhbv_2_mts"
     verbose: bool = False
+
+    def to_yaml_str(self) -> str:
+        return format_serializers.to_yaml_str(self.dict(by_alias=True, exclude_none=True))
 
     class Config(serde.YamlSerializerDeserializer.Config):
         fields = {
