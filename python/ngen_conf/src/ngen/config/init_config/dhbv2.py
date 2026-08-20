@@ -15,8 +15,6 @@ class Dhbv2Mts(serde.YamlSerializerDeserializer):
     static attributes to 0.0, so these act as explicit placeholders.
     """
 
-    catchment_id: str
-
     aridity: float = Field(0.0, units=CommonUnits.Dimensionless, description="aridity index")
     # NOTE: the BMI source (mts_bmi.py _static_input_vars) declares meanP and ETPOT_Hargr
     # as `mm d-1`, but the model was trained on annual values based on the
@@ -72,10 +70,7 @@ class Dhbv2Mts(serde.YamlSerializerDeserializer):
     lengthkm: float = Field(0.0, units="kilometer", description="stream network length")
 
     model_dir: str = "/home/ec2-user/models/dhbv_2_mts"
-    dtype: str = "float32"
     verbose: bool = False
-    # NOTE: informational only; the BMI uses `time_step_size` (default 3600 s)
-    time_step: str = "1 hour"
 
     class Config(serde.YamlSerializerDeserializer.Config):
         fields = {
@@ -110,7 +105,5 @@ class Dhbv2Mts(serde.YamlSerializerDeserializer):
             "catchsize": {"description": "catchment area [km2]"},
             "lengthkm": {"description": "stream network length [km]"},
             "model_dir": {"description": "path to dhbv2 model weights directory"},
-            "dtype": {"description": "floating point precision for model"},
             "verbose": {"description": "enable verbose logging"},
-            "time_step": {"description": "informational; BMI uses time_step_size (default 3600 s)"},
         }
