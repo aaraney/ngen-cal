@@ -10,6 +10,7 @@ from ngen.config.soil_freeze_thaw import SoilFreezeThaw
 from ngen.config.soil_moisture_profile import SoilMoistureProfile
 from ngen.config.topmod import Topmod
 from ngen.config.lstm import LSTM
+from ngen.config.dhbv2 import Dhbv2Mts
 from ngen.config.multi import MultiBMI
 
 # set the workdir relative to this test config
@@ -22,6 +23,7 @@ _noah_owp_config_data_path = _datadir / "init_config_data" / "noah_owp.namelist"
 _soil_freeze_thaw_config_data_path = _datadir / "init_config_data" / "soil_freeze_thaw.txt"
 _soil_moisture_profile_config_data_path = _datadir / "init_config_data" / "soil_moisture_profile.txt"
 _casam_config_data_path = _datadir / "init_config_data" / "casam.txt"
+_dhbv2_config_data_path = _datadir / "init_config_data" / "dhbv2.yaml"
 _topmodel_subcat_config_path = _datadir / "init_config_data" / "subcat.dat"
 _topmodel_params_config_path = _datadir / "init_config_data" / "params.dat"
 _topmodel_config_path = _datadir / "init_config_data" / "topmodel.run"
@@ -122,6 +124,16 @@ def lstm_params():
     return data
 
 @pytest.fixture
+def dhbv2_params():
+    path = _workdir.joinpath("data/CFE/")
+    data = {
+            'model_type_name': 'dhbv2.0_mts',
+            'name': 'bmi_python',
+            'config_prefix':path,
+            'config': "{{id}}_config.txt"}
+    return data
+
+@pytest.fixture
 def lgar_params():
     path = _workdir.joinpath("data/dne/")
     data = {
@@ -179,6 +191,10 @@ def noahowp(noahowp_params):
 @pytest.fixture
 def lstm(lstm_params):
     return LSTM(**lstm_params)
+
+@pytest.fixture
+def dhbv2(dhbv2_params):
+    return Dhbv2Mts(**dhbv2_params)
 
 @pytest.fixture
 def lgar(lgar_params):
@@ -239,6 +255,11 @@ def soil_moisture_profile_init_config() -> str:
 def casam_init_config() -> str:
     # drop eol char
     return _casam_config_data_path.read_text().rstrip()
+
+@pytest.fixture
+def dhbv2_init_config() -> str:
+    # drop eol char
+    return _dhbv2_config_data_path.read_text().rstrip()
 
 @pytest.fixture
 def topmodel_subcat_config_path() -> Path:
