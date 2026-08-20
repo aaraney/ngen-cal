@@ -127,7 +127,7 @@ def lstm_params():
 def dhbv2_params():
     path = _workdir.joinpath("data/CFE/")
     data = {
-            'model_type_name': 'dhbv2.0 mts',
+            'model_type_name': 'dhbv2.0_mts',
             'name': 'bmi_python',
             'config_prefix':path,
             'config': "{{id}}_config.txt"}

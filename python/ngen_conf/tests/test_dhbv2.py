@@ -17,8 +17,8 @@ def test_dhbv2_formulation(dhbv2_params):
     dhbv2_formulation = Formulation(**f)
     _dhbv2 = dhbv2_formulation.params
     assert _dhbv2.name == "bmi_python"
-    assert _dhbv2.model_name == "dhbv2.0 mts"
+    assert _dhbv2.model_name == "dhbv2.0_mts"
     serialized = _dhbv2.dict(by_alias=True)
-    assert serialized["model_type_name"] == "dhbv2.0 mts"
+    assert serialized["model_type_name"] == "dhbv2.0_mts"
     assert serialized["python_type"] == "dhbv2.mts_bmi.MtsDeltaModelBmi"
     assert serialized["main_output_variable"] == "land_surface_water__runoff_volume_flux"

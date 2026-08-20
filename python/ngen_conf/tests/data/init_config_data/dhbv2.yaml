@@ -14,9 +14,7 @@ T_gravel: 0.0
 T_sand: 0.0
 T_silt: 0.0
 aridity: 0.0
-catchment_id: cat-27
 catchsize: 0.0
-dtype: float32
 glaciers: 0.0
 lengthkm: 0.0
 meanP: 0.0
@@ -30,6 +28,5 @@ seasonality_P: 0.0
 seasonality_PET: 0.0
 snow_fraction: 0.0
 snowfall_fraction: 0.0
-time_step: 1 hour
 uparea: 0.0
 verbose: false

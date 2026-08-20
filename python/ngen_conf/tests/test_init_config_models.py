@@ -133,7 +133,15 @@ def test_casam(casam_init_config: str):
 def test_dhbv2(dhbv2_init_config: str):
     o = Dhbv2Mts.from_yaml_str(dhbv2_init_config)
     assert o.to_yaml_str() == dhbv2_init_config
-    assert o.catchment_id == "cat-27"
+
+
+def test_dhbv2_omits_unset_fields():
+    o = Dhbv2Mts(aridity=1.5)
+    serialized = o.to_yaml_str()
+    assert "aridity: 1.5" in serialized
+    # fields left unset (None) should not appear in the output at all
+    assert "meanP" not in serialized
+    assert "uparea" not in serialized
 
 
 def test_topmodel_subcat(topmodel_subcat_config: str):
