@@ -13,6 +13,6 @@ class Dhbv2Mts(BMIPython):
     main_output_variable: Literal[
         "land_surface_water__runoff_volume_flux"
     ] = "land_surface_water__runoff_volume_flux"
-    model_name: Literal["dhbv2.0 mts"] = Field(
-        "dhbv2.0 mts", alias="model_type_name"
+    model_name: Literal["dhbv2.0_mts"] = Field(
+        "dhbv2.0_mts", alias="model_type_name"
     )
