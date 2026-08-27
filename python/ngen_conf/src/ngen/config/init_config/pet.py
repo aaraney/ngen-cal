@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Literal
 
 from ngen.init_config import serializer_deserializer as serde
+from ngen.init_config.units import CommonUnits, Field
 from pydantic import validator
 
 
@@ -44,26 +45,32 @@ class PetMethod(int, Enum):
 class PET(
     serde.IniSerializerDeserializer,
 ):
-    verbose: bool
+    verbose: bool = False
     pet_method: PetMethod
     forcing_file: Literal["BMI"] = "BMI"
     run_unit_tests: bool = False  # bool; serialize as int
-    yes_aorc: bool  # bool; serialize as int
-    yes_wrf: bool  # bool; serialize as int
-    wind_speed_measurement_height_m: float  # 10.0 m
-    humidity_measurement_height_m: float  # 2.0
-    vegetation_height_m: float  # 0.12
-    zero_plane_displacement_height_m: float  # 0.0003
-    momentum_transfer_roughness_length: float  # 0.0
-    heat_transfer_roughness_length_m: float
-    surface_longwave_emissivity: float
-    surface_shortwave_albedo: float
-    cloud_base_height_known: bool  # serialize in all caps
-    latitude_degrees: float
-    longitude_degrees: float
-    site_elevation_m: float
-    time_step_size_s: int
+    yes_aorc: bool = True  # bool; serialize as int
+
+    # --- Length Parameters ---
+    wind_speed_measurement_height_m: float = Field(units=CommonUnits.Meter)  # 10.0 m
+    humidity_measurement_height_m: float = Field(units=CommonUnits.Meter)  # 2.0
+    vegetation_height_m: float = Field(units=CommonUnits.Meter)  # 0.12
+    zero_plane_displacement_height_m: float = Field(units=CommonUnits.Meter)  # 0.0003
+    momentum_transfer_roughness_length_m: float = Field(units=CommonUnits.Meter)  # 0.0
+    heat_transfer_roughness_length_m: float = Field(units=CommonUnits.Meter)
+
+    # --- Radiation Parameters (Dimensionless Fractions) ---
+    surface_longwave_emissivity: float = Field(ge=0.0, le=1.0, units=CommonUnits.Dimensionless)
+    surface_shortwave_albedo: float = Field(ge=0.0, le=1.0, units=CommonUnits.Dimensionless)
+
+    # --- Location & Time ---
+    latitude_degrees: float = Field(units="degree")
+    longitude_degrees: float = Field(units="degree")
+    site_elevation_m: float = Field(units=CommonUnits.Meter)
+    time_step_size_s: int = Field(units=CommonUnits.Second)
     num_timesteps: int
+
+    # --- Options ---
     shortwave_radiation_provided: bool  # bool; serialize as int
 
     @validator("pet_method", pre=True)

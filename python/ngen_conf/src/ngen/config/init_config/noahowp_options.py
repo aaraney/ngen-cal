@@ -244,12 +244,14 @@ class StomatalResistanceOption(int, Enum):
         1 -> Noah (soil moisture)
         2 -> CLM  (matric potential)
         3 -> SSiB (matric potential)
+        4 -> canopy_pet; Maximize transpiration by reducing stomatal resistance. https://github.com/NOAA-OWP/noah-owp-modular/pull/125
     source: https://github.com/NOAA-OWP/noah-owp-modular/blob/30d0f53e8c14acc4ce74018e06ff7c9410ecc13c/src/OptionsType.f90#L92-L96
     """
 
     noah = 1
     clm = 2
     ssib = 3
+    canopy_pet = 4
 
 
 class EvapSrfcResistanceOption(int, Enum):
@@ -260,6 +262,7 @@ class EvapSrfcResistanceOption(int, Enum):
         2 -> Sellers (1992)
         3 -> adjusted Sellers to decrease RSURF for wet soil
         4 -> option 1 for non-snow; rsurf = rsurf_snow for snow (set in MPTABLE); AD v3.8
+        5 -> surface_pet; Maximize soil evaporation by reducing resistance. https://github.com/NOAA-OWP/noah-owp-modular/pull/125
     source: https://github.com/NOAA-OWP/noah-owp-modular/blob/30d0f53e8c14acc4ce74018e06ff7c9410ecc13c/src/OptionsType.f90#L97-L102
     """
 
@@ -267,6 +270,7 @@ class EvapSrfcResistanceOption(int, Enum):
     sellers = 2
     adjusted_sellers = 3
     sakaguchi_and_zeng_for_nonsnow_rsurf_eq_rsurf_snow_for_snow = 4
+    surface_pet = 5
 
 
 class SubsurfaceOption(int, Enum):

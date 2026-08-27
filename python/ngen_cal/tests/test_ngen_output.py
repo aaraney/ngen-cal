@@ -33,13 +33,24 @@ troute_output_variants = (
 
 @pytest.mark.parametrize("file", troute_output_variants)
 def test_ngen_cal_model_output(file: pathlib.Path, ngen_cal_model_config: NgenBase):
+    import hypy
+
     output = TrouteOutput(file)
 
     # setup plugin
     output.ngen_cal_model_configure(config=ngen_cal_model_config)
 
-    feature = "wb-2420800"
-    df = output.get_output(id=feature)
+    nexus_id = "nex-2420800"
+    contributing_features = ["cat-2420800"]
+    hydrolocation = hypy.HydroLocation(realized_nexus=nexus_id)
+    contributing_catchments = [hypy.Catchment(id, {}) for id in contributing_features]
+    nexus = hypy.Nexus(
+        nexus_id=nexus_id,
+        hydro_location=hydrolocation,
+        contributing_catchments=contributing_catchments,
+    )
+
+    df = output.get_output(nexus=nexus)
     assert df is not None, "expect to receive pd.Series"
 
     dt = datetime.fromisoformat("2023-04-02 01:00:00")

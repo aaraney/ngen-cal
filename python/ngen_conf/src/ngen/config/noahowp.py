@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, Extra
 
 from .bmi_formulation import BMIFortran
 
@@ -11,7 +11,8 @@ class NoahOWPParams(BaseModel, extra='allow'):
     """
     #define params which can be adjusted here
     #see cfe.py for example
-    pass
+    class Config(BaseModel.Config):
+        extra = Extra.allow
 
 class NoahOWP(BMIFortran):
     """A BMIFortran implementation for a noahowp module
