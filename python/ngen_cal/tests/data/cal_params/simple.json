@@ -1,0 +1,71 @@
+{
+    "disable_catchment_output": true,
+    "global": {
+        "forcing": {
+            "path": "/home/ec2-user/forcing/forcing.nc",
+            "provider": "NetCDF"
+        },
+        "formulations": [
+            {
+                "name": "bmi_multi",
+                "params": {
+                    "allow_exceed_end_time": true,
+                    "forcing_file": "",
+                    "init_config": "",
+                    "main_output_variable": "Qout",
+                    "model_type_name": "NoahOWP_TOPMODEL",
+                    "modules": [
+                        {
+                            "name": "bmi_fortran",
+                            "params": {
+                                "allow_exceed_end_time": true,
+                                "forcing_file": "",
+                                "init_config": "/home/ec2-user/configs/NoahOWP_{{id}}.namelist",
+                                "library_file": "/dmod/shared_libs/libsurfacebmi",
+                                "main_output_variable": "QINSUR",
+                                "model_type_name": "NoahOWP",
+                                "name": "bmi_fortran",
+                                "variables_names_map": {
+                                    "LWDN": "land_surface_radiation~incoming~longwave__energy_flux",
+                                    "PRCPNONC": "APCP_surface",
+                                    "Q2": "atmosphere_air_water~vapor__relative_saturation",
+                                    "SFCPRS": "land_surface_air__pressure",
+                                    "SFCTMP": "land_surface_air__temperature",
+                                    "SOLDN": "land_surface_radiation~incoming~shortwave__energy_flux",
+                                    "UU": "land_surface_wind__x_component_of_velocity",
+                                    "VV": "land_surface_wind__y_component_of_velocity"
+                                },
+                                "model_params": {
+                                    "MFSNO": 2.5
+                                }
+                            }
+                        },
+                        {
+                            "name": "bmi_c",
+                            "params": {
+                                "allow_exceed_end_time": true,
+                                "forcing_file": "",
+                                "init_config": "/home/ec2-user/configs/Topmodel_{{id}}.dat",
+                                "library_file": "/dmod/shared_libs/libtopmodelbmi",
+                                "main_output_variable": "Qout",
+                                "model_type_name": "TOPMODEL",
+                                "name": "bmi_c",
+                                "registration_function": "register_bmi_topmodel",
+                                "variables_names_map": {
+                                    "atmosphere_water__liquid_equivalent_precipitation_rate": "QINSUR",
+                                    "water_potential_evaporation_flux": "EVAPOTRANS"
+                                }
+                            }
+                        }
+                    ],
+                    "name": "bmi_multi"
+                }
+            }
+        ]
+    },
+    "time": {
+        "start_time": "2015-12-01 00:00:00",
+        "end_time": "2015-12-01 23:00:00",
+        "output_interval": 3600
+    }
+}

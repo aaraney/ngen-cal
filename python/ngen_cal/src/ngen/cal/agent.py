@@ -59,7 +59,7 @@ class BaseAgent(ABC):
 
 class Agent(BaseAgent):
 
-    def __init__(self, model: Model, workdir: Path, log: bool=False, restart: bool=False, parameters: Mapping[str, Any] | None = {}):
+    def __init__(self, model: Model, workdir: Path, log: bool=False, restart: bool=False, parameters: Mapping[str, Any] | None = None):
         self._workdir = workdir
         self._job = None
         assert not isinstance(model.model, NoModel), "invariant"
@@ -77,7 +77,7 @@ class Agent(BaseAgent):
             # 0 correctly since not all basin params can be loaded.
             # There are probably some similar issues with explicit and independent, since they have
             # similar data semantics
-            workdirs = list(Path.glob(workdir, ngen_model.type+"_*_worker"))
+            workdirs = list(workdir.glob(f"*_{ngen_model.type}_*_worker"))
             if len(workdirs) > 1:
                 print("More than one existing workdir, cannot restart")
             elif len(workdirs) == 1:
@@ -88,7 +88,7 @@ class Agent(BaseAgent):
         ngen_model.workdir = self.job.workdir
         self._model.model.resolve_paths(self.job.workdir)
 
-        self._params = parameters
+        self._params = parameters or {}
 
     @property
     def parameters(self) -> Mapping[str, Any]:

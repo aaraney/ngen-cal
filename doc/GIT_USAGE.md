@@ -30,7 +30,7 @@ Note that this document goes into detail on the Git strategy and branching model
 ### Feature Branches from `master`
 This illustrates the relationship between feature branches and `master`.  They should be created from `master` and independently contain commits from their feature.  Once done, the changes will be reintegrated back into `master` via rebasing.
 
-```mermaid 
+```mermaid
     %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': { 'showBranches': true, 'showCommitLabel':true, 'mainBranchName': 'master'}}}%%
     gitGraph
         commit id:"feature1.1"
@@ -52,7 +52,7 @@ This illustrates the relationship between feature branches and `master`.  They s
 
 The resulting state of `master` after rebasing the two new feature branches would be:
 
-```mermaid 
+```mermaid
     %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': { 'showBranches': true, 'showCommitLabel':true, 'mainBranchName': 'master'}}}%%
     gitGraph
         commit id:"feature1.1"
@@ -69,7 +69,7 @@ The resulting state of `master` after rebasing the two new feature branches woul
 This illustrates the relationship between `production`, `master`, and `release-v2`.  Notice that `production` has already been tagged with version `v1` at the start.  Commits for `feature1` and `feature2` at some point are integrated into `master`.  When it is time to prepare to release version `v2`, `release-v2` is created.  A few bug fix commits were needed in `release-v2`.  After that, all the changes in `release-v2` are integrated into `production`, and `production` is tagged `v2`.  All the changes are also integrated back into `master`.
 
 
-```mermaid 
+```mermaid
     %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': { 'showBranches': true, 'showCommitLabel':true, 'mainBranchName': 'master'}}}%%
     gitGraph
         commit id:"v1-commit"
@@ -95,7 +95,7 @@ This illustrates the relationship between `production`, `master`, and `release-v
 
 The resulting state of `production` is:
 
-```mermaid 
+```mermaid
     %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': { 'showBranches': true, 'showCommitLabel':true, 'mainBranchName': 'production'}}}%%
     gitGraph
         commit id:"v1-commit" tag:"v1"
@@ -110,7 +110,7 @@ The resulting state of `production` is:
 
 The resulting state of `master` is essentially the same:
 
-```mermaid 
+```mermaid
     %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': { 'showBranches': true, 'showCommitLabel':true, 'mainBranchName': 'master'}}}%%
     gitGraph
         commit id:"v1-commit"

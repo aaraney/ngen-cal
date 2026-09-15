@@ -4,6 +4,7 @@ from pathlib import Path
 from tempfile import mkdtemp
 from datetime import datetime
 from typing import TYPE_CHECKING
+from shutil import rmtree
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -23,7 +24,11 @@ class JobMeta:
             log (bool, optional): Whether or not to create a log file for the job. Defaults to False.
         """
         if workdir is None:
+            # a little hacky... create tmpdir really for the name only
+            # remove it, then create it with normal permissions
             self._workdir = Path( mkdtemp(dir=parent_workdir, prefix=f"{datetime.now().strftime('%Y%m%d%H%M')}_{name}_", suffix="_worker") ).resolve()
+            rmtree(self._workdir)
+            self._workdir.mkdir(parents=True, exist_ok=True)
         else:
             self._workdir = workdir
 
