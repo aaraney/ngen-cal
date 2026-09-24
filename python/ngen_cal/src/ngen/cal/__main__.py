@@ -121,7 +121,7 @@ def _validation(agent: Agent, validation_parms: ValidationOptions):
             ngen.args = args
             print(f"binary and args overridden. using: {agent.cmd!r}")
 
-        print("starting calibration")
+        print("starting validation")
         # TODO: validation_parms.objective and target are not being correctly configured
         _execute(agent)
         with pushd(agent.job.workdir):

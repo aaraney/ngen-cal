@@ -51,7 +51,7 @@ class Parameter(BaseModel):
     Callback function applied to a parameter to transform or derive a value
     prior to setting it over bmi.
 
-    Transform function must be 1 or 3 shapes. Function argument names must match.
+    Transform function must be 1 of 3 shapes. Function argument names must match.
     (float) -> float
     (value: float, parameter: Parameter, parameter_set: SetParameters) -> float
       args must be named `value`, `parameter` and `parameter_set`
@@ -209,7 +209,7 @@ def _identify_transform_fn_variant(fn: TransformFn) -> type[TransformFn]:
     if len(sig.parameters) == 0:
         raise RuntimeError(
             f"invalid transform function, {fn.__qualname__!r}\n"
-            "transform function must be 1 or 3 shapes:\n"
+            "transform function must be 1 of 3 shapes:\n"
             "(float) -> float\n"
             "(value: float, parameter: Parameter, parameter_set: SetParameters) -> float\n"
             "  args must be named `value`, `parameter`, and `parameter_set`\n"

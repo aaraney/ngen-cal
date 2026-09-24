@@ -62,7 +62,7 @@ Plugin developers may find internal plugin implementations useful as additional 
 
 By convention, the name of plugin module's should start with `ngen_cal` or `ngen_cal_model` depending on the type of plugin.
 Class plugins are encouraged to use the prefix `NgenCal` or `NgenCalModel` but this is not strictly required.
-Similarly, plugins that required additional settings should use their class or module name as the as top level key in the `plugin_settings` dictionary.
+Similarly, plugins that require additional settings should use their class or module name as the as top level key in the `plugin_settings` dictionary.
 
 > [!NOTE]
 > All plugin functions and methods must be decorated with `ngen.cal.hookimpl` for `ngen.cal` to register them.
