@@ -6,12 +6,15 @@ import pytest
 from ngen.init_config import utils
 
 from ngen.config.init_config.cfe import CFE
-from ngen.config.init_config.lgar import Lgar
+from ngen.config.init_config.casam import Casam
+from ngen.config.init_config.dhbv2 import Dhbv2Mts
 from ngen.config.init_config.noahowp import NoahOWP
 from ngen.config.init_config.pet import PET
 from ngen.config.init_config.soil_freeze_thaw import SoilFreezeThaw
 from ngen.config.init_config.soil_moisture_profile import SoilMoistureProfile
 from ngen.config.init_config.topmodel import Topmodel, TopModelSubcat, TopModelParams
+from ngen.config.init_config.snow17 import Snow17, Snow17Params
+from ngen.config.init_config.sacsma import SacSma, SacSmaParams
 
 from typing import TYPE_CHECKING
 
@@ -122,9 +125,23 @@ def test_soil_moisture_profile(soil_moisture_profile_init_config: str):
     assert o.to_ini_str() == soil_moisture_profile_init_config
 
 
-def test_lgar(lgar_init_config: str):
-    o = Lgar.from_ini_str(lgar_init_config)
-    assert o.to_ini_str() == lgar_init_config
+def test_casam(casam_init_config: str):
+    o = Casam.from_ini_str(casam_init_config)
+    assert o.to_ini_str() == casam_init_config
+
+
+def test_dhbv2(dhbv2_init_config: str):
+    o = Dhbv2Mts.from_yaml_str(dhbv2_init_config)
+    assert o.to_yaml_str() == dhbv2_init_config
+
+
+def test_dhbv2_omits_unset_fields():
+    o = Dhbv2Mts(aridity=1.5)
+    serialized = o.to_yaml_str()
+    assert "aridity: 1.5" in serialized
+    # fields left unset (None) should not appear in the output at all
+    assert "meanP" not in serialized
+    assert "uparea" not in serialized
 
 
 def test_topmodel_subcat(topmodel_subcat_config: str):
@@ -203,3 +220,19 @@ def test_topmodel_initialize_fields_with_non_path_pair_instances(
     assert model.subcat.inner == subcat
     assert model.params.inner is not None
     assert model.params.inner == params
+
+def test_snow17(snow17_config: str):
+    o = Snow17.from_namelist_str(snow17_config)
+    assert o.to_namelist_str() == snow17_config
+
+def test_snow17_params(snow17_params_config: str):
+    o = Snow17Params.from_str(snow17_params_config)
+    assert o.to_str() == snow17_params_config
+
+def test_sacsma(sacsma_config: str):
+    o = SacSma.from_namelist_str(sacsma_config)
+    assert o.to_namelist_str() == sacsma_config
+
+def test_sacsma_params(sacsma_params_config: str):
+    o = SacSmaParams.from_str(sacsma_params_config)
+    assert o.to_str() == sacsma_params_config

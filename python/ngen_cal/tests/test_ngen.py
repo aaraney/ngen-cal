@@ -40,3 +40,38 @@ def test_NgenBase_verify_realization(ngen_config: Ngen):
 
     with pytest.raises(pydantic.ValidationError):
         Ngen.parse_obj(dict(config))
+
+
+def test_log_bmi_parameter_space(tmp_path: pathlib.Path):
+    import pandas as pd
+
+    iteration = 0
+    space_id = None
+    path = tmp_path / NgenBase.bmi_parameter_space_filename(space_id)
+    params = pd.DataFrame({"model": ["test"], "param": ["p"], "value": [1]})
+    NgenBase.log_bmi_parameter_space(
+        i=iteration, id=space_id, params_df=params, path=tmp_path
+    )
+    expect = pd.DataFrame({"model": ["test"], "param": ["p"], str(iteration): [1]})
+    got = pd.read_parquet(path)
+    assert got.equals(expect)
+
+
+def test_log_bmi_parameter_space_warns(tmp_path: pathlib.Path):
+    import pandas as pd
+
+    iteration = 0
+    space_id = None
+    path = tmp_path / NgenBase.bmi_parameter_space_filename(space_id)
+    params = pd.DataFrame({"model": ["test"], "param": ["p"], "value": [1]})
+    NgenBase.log_bmi_parameter_space(
+        i=iteration, id=space_id, params_df=params, path=tmp_path
+    )
+    new = pd.DataFrame({"model": ["test"], "param": ["p"], "value": [2]})
+    with pytest.warns(UserWarning):
+        NgenBase.log_bmi_parameter_space(
+            i=iteration, id=space_id, params_df=new, path=tmp_path
+        )
+    expect = pd.DataFrame({"model": ["test"], "param": ["p"], str(iteration): [2]})
+    got = pd.read_parquet(path)
+    assert got.equals(expect)

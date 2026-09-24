@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, Extra
 
 from .bmi_formulation import BMICxx
 
@@ -47,6 +47,9 @@ class LgarParams(BaseModel):
     negative capillary head representing field capacity, used in reduction of PET to AET
     Unit: cm
     """
+
+    class Config(BaseModel.Config):
+        extra = Extra.allow
 
 
 class LGAR(BMICxx):

@@ -18,11 +18,14 @@ class IniSerializerDeserializer(ser.IniSerializer, de.IniDeserializer):
             If True, output ini will not have section headers (default: `False`)
         - `space_around_delimiters`: bool
             If True, delimiters between keys and values are surrounded by spaces (default: `True`)
+        - `preserve_key_case`: bool
+            If True, keys will be case sensitively (de)serialized (default: `False`)
     """
 
     class Config(ser.IniSerializer.Config):  # type: ignore
         no_section_headers: bool = False
         space_around_delimiters: bool = True
+        preserve_key_case: bool = False
 
 
 class NamelistSerializerDeserializer(ser.NamelistSerializer, de.NamelistDeserializer):

@@ -29,24 +29,29 @@ class IniDeserializer(Base):
 
         - `no_section_headers`: bool
             Denotes that ini file does not have section headers (default: `False`)
+        - `preserve_key_case`: bool
+            If True, keys will be case sensitively deserialized (default: `False`)
     """
 
     class Config(Base.Config):
         no_section_headers: bool = False
+        preserve_key_case: bool = False
 
     @classmethod
     def from_ini(cls, p: Path) -> Self:
         no_section_headers = merge_class_attr(cls, "Config.no_section_headers", False)
+        preserve_key_case = merge_class_attr(cls, "Config.preserve_key_case", False)
         if no_section_headers:
-            return from_ini_no_section_header_str(p.read_text(), cls)
-        return from_ini_str(p.read_text(), cls)
+            return from_ini_no_section_header_str(p.read_text(), cls, preserve_key_case=preserve_key_case)
+        return from_ini_str(p.read_text(), cls, preserve_key_case=preserve_key_case)
 
     @classmethod
     def from_ini_str(cls, s: str) -> Self:
         no_section_headers = merge_class_attr(cls, "Config.no_section_headers", False)
+        preserve_key_case = merge_class_attr(cls, "Config.preserve_key_case", False)
         if no_section_headers:
-            return from_ini_no_section_header_str(s, cls)
-        return from_ini_str(s, cls)
+            return from_ini_no_section_header_str(s, cls, preserve_key_case=preserve_key_case)
+        return from_ini_str(s, cls, preserve_key_case=preserve_key_case)
 
 
 class NamelistDeserializer(Base):

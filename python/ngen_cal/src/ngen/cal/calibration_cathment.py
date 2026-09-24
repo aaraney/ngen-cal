@@ -21,7 +21,7 @@ class AdjustableCatchment(FormulatableCatchment, Adjustable):
         parameteters used by the catchment.
     """
 
-    def __init__(self,  workdir: Path, id: str, nexus, params: dict = {}):
+    def __init__(self,  workdir: Path, id: str, nexus: Nexus, params: dict = {}):
         """Create an adjustable catchment and initialize its parameter space
 
         Args:
@@ -72,7 +72,7 @@ class EvaluatableCatchment(Evaluatable):
         #use the nwis location to get observation data
         obs = self._outflow._hydro_location.get_data(start_time, end_time)
         #make sure data is hourly
-        self._observed = obs.set_index('value_time')['value'].resample('1H').nearest()
+        self._observed = obs.set_index('value_time')['value'].resample('h').nearest()
         self._observed.rename('obs_flow', inplace=True)
         #observations in ft^3/s convert to m^3/s
         self._observed = self._observed * 0.028316847

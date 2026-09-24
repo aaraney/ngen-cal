@@ -86,7 +86,7 @@ class ModelHooks:
         """
 
     @hookspec(firstresult=True)
-    def ngen_cal_model_output(self, id: str | None) -> pd.Series:
+    def ngen_cal_model_output(self, nexus: Nexus) -> pd.Series:
         """
         Called during each calibration iteration to provide the model output in
         the form of a pandas Series, indexed by time.
@@ -100,4 +100,16 @@ class ModelHooks:
         And before the next iteration is configured and started.
         Currently called at the end of an Adjustable's check_point function
         which writes out calibration/parameter state data each iteration.
+
+        Raise `ngen.cal.errors.StopEarly` to cancel further calibration iterations.
+        Post-calibration validation will be conducted if configured.
+        """
+
+    @hookspec(firstresult=True)
+    def ngen_cal_model_validation_cmd(self, binary: str, args: str) -> tuple[str, str]:
+        """
+        Called before validation to override the command used for validation.
+        A plugin should return a tuple of [binary: str, args: str].
+
+        `binary` and `args` contain the values used for calibration.
         """

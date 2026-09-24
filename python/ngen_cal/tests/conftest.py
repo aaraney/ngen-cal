@@ -128,8 +128,8 @@ def fabric():
 
 class MockLocation:
     def __init__(self):
-        now = pd.Timestamp.now().round('H')
-        self.ts = pd.DataFrame({'value':[1,2,3,4,5], "value_time":pd.date_range(now, periods=5, freq='H')})
+        now = pd.Timestamp.now().round('h')
+        self.ts = pd.DataFrame({'value':[1,2,3,4,5], "value_time":pd.date_range(now, periods=5, freq='h')})
 
     def get_data(self, *args, **kwargs):
         return self.ts
